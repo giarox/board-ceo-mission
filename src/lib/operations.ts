@@ -5,6 +5,10 @@ export type Operation = {
   activation: string;
   briefing: string;
   success: string;
+  // Optional penalty/failure condition shown as its own red callout.
+  failure?: string;
+  // Optional pre-thought scenarios surfaced behind a button (e.g. call ideas).
+  callIdeas?: string[];
   // No countdown: it's a state you switch on for the whole night, not a timed task.
   noTimer?: boolean;
 };
@@ -20,6 +24,8 @@ export const OPERATIONS: Operation[] = [
     briefing:
       "Tutti i membri del Board devono indossare il badge ufficiale fino alla fine del Summit. L’attivazione dei badge viene sancita da uno shot inaugurale, che certifica l’inizio operativo del Marriage Acquisition Summit 2026.",
     success:
+      "Indossare il badge ufficiale per tutta la durata del Summit, a partire dallo shot inaugurale.",
+    failure:
       "Tutti i badge devono tornare a casa. Chi perde, dimentica o distrugge il badge offre uno shot a tutto il Board.",
   },
   {
@@ -43,6 +49,10 @@ export const OPERATIONS: Operation[] = [
       "Devi chiamare una persona scelta dal Board e seguire alla lettera lo scenario assegnato, senza ridere, senza smentire e senza chiedere scusa in diretta.",
     success:
       "Generare almeno una reazione valida, reale e genuina dall'altra parte della cornetta. Silenzi imbarazzati inclusi.",
+    callIdeas: [
+      "Chiama un amico non presente e fagli credere che stai seriamente mettendo in dubbio il matrimonio e l'idea stessa di sposarti.",
+      "Chiama un parente (o qualcuno di mooolto vicino) e fagli credere che abbiamo perso Andre, il fratello, qui a Berlino.",
+    ],
   },
   {
     code: "OP-04",

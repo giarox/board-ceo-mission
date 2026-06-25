@@ -35,6 +35,13 @@ type StoredVerdict = {
   details: { code: string; name: string; score: number | null }[];
 };
 
+function fmtClock(ms: number) {
+  const total = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
 export function PerformanceReview({
   reviews,
   setReview,
@@ -50,6 +57,15 @@ export function PerformanceReview({
   const statuses: Record<string, OpStatus> = useMemo(() => {
     const m: Record<string, OpStatus> = {};
     for (const o of OPERATIONS) m[o.code] = statusFromRuntime(runtimes[o.code]);
+    return m;
+  }, [runtimes]);
+  // Time taken to verify the immediate operability — a reference for the vote.
+  const times: Record<string, number> = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const o of OPERATIONS) {
+      const e = runtimes[o.code]?.elapsedMs;
+      if (e != null && e > 0) m[o.code] = e;
+    }
     return m;
   }, [runtimes]);
 
@@ -95,6 +111,7 @@ export function PerformanceReview({
       <ListView
         reviews={reviews}
         statuses={statuses}
+        times={times}
         onOpen={openReview}
         onVerdict={createVerdict}
         verdict={verdict}
@@ -108,6 +125,7 @@ export function PerformanceReview({
       reviews={reviews}
       setReview={setReview}
       statuses={statuses}
+      times={times}
       startIndex={idx}
       onBack={() => setMode("list")}
       onVerdict={createVerdict}
@@ -120,6 +138,7 @@ export function PerformanceReview({
 function ListView({
   reviews,
   statuses,
+  times,
   onOpen,
   onVerdict,
   verdict,
@@ -127,6 +146,7 @@ function ListView({
 }: {
   reviews: Record<string, Review>;
   statuses: Record<string, OpStatus>;
+  times: Record<string, number>;
   onOpen: (i: number) => void;
   onVerdict: () => void;
   verdict: StoredVerdict | null;
@@ -194,6 +214,11 @@ function ListView({
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2">
                       <StatusChip status={st} />
+                      {times[op.code] != null && (
+                        <span className="eyebrow flex items-center gap-1 rounded-md border border-border bg-paper-2 px-2 py-1 text-[10px] text-ink-soft">
+                          <Clock className="h-3 w-3" /> {fmtClock(times[op.code])}
+                        </span>
+                      )}
                       {voted && (
                         <span className="eyebrow rounded-md bg-night px-2 py-1 text-[10px] text-paper">
                           Rating {score}
@@ -285,6 +310,7 @@ function ReviewCarousel({
   reviews,
   setReview,
   statuses,
+  times,
   startIndex,
   onBack,
   onVerdict,
@@ -292,6 +318,7 @@ function ReviewCarousel({
   reviews: Record<string, Review>;
   setReview: (code: string, value: Review) => void;
   statuses: Record<string, OpStatus>;
+  times: Record<string, number>;
   startIndex: number;
   onBack: () => void;
   onVerdict: () => void;
@@ -369,6 +396,7 @@ function ReviewCarousel({
                 <ReviewCard
                   op={op}
                   status={statuses[op.code]}
+                  time={times[op.code]}
                   review={reviews[op.code] ?? { score: null, tags: [], notes: [] }}
                   onChange={(p) => applyPatch(op.code, p)}
                 />
@@ -419,11 +447,13 @@ function ReviewCarousel({
 function ReviewCard({
   op,
   status,
+  time,
   review,
   onChange,
 }: {
   op: (typeof OPERATIONS)[number];
   status: OpStatus;
+  time?: number;
   review: Review;
   onChange: (p: Partial<Review>) => void;
 }) {
@@ -444,6 +474,14 @@ function ReviewCard({
       </div>
       <h3 className="font-display mt-1.5 text-2xl leading-tight text-ink">{op.name}</h3>
       <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">Obiettivo: {op.success}</p>
+
+      {time != null && (
+        <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-border bg-paper-2 px-3 py-1.5">
+          <Clock className="h-4 w-4 text-ink-soft" />
+          <span className="text-[13px] text-ink-soft">Operatività verificata in</span>
+          <span className="font-display tabular-nums text-ink">{fmtClock(time)}</span>
+        </div>
+      )}
 
       <div className="mt-6">
         <div className="flex items-center justify-between gap-2">
