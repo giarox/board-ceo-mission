@@ -4,7 +4,7 @@ import { FileText, Target, ClipboardCheck } from "lucide-react";
 import { Dossier } from "@/components/Dossier";
 import { Operations } from "@/components/Operations";
 import { PerformanceReview } from "@/components/PerformanceReview";
-import { useLocalState } from "@/lib/use-local-state";
+import { useLocalState, useSharedMap } from "@/lib/use-local-state";
 import { EMPTY_REVIEWS, isShotScore, type Review } from "@/lib/operations";
 
 export const Route = createFileRoute("/")({
@@ -35,7 +35,7 @@ const TABS: { id: SectionId; label: string; Icon: typeof FileText }[] = [
 
 function Home() {
   const [shots, setShots] = useLocalState<number>("shots:timers", 0);
-  const [reviews, setReviews] = useLocalState<Record<string, Review>>("reviews:v1", EMPTY_REVIEWS);
+  const [reviews, setReview] = useSharedMap<Review>("reviews:v1", EMPTY_REVIEWS);
 
   const reviewShots = useMemo(
     () => Object.values(reviews).reduce((n, x) => n + (isShotScore(x.score) ? 1 : 0), 0),
@@ -125,7 +125,7 @@ function Home() {
         <Operations setShots={setShots} />
       </div>
       <div ref={refs.review} data-section="review">
-        <PerformanceReview reviews={reviews} setReviews={setReviews} />
+        <PerformanceReview reviews={reviews} setReview={setReview} />
       </div>
     </main>
   );

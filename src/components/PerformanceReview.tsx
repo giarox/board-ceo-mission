@@ -36,10 +36,10 @@ type StoredVerdict = {
 
 export function PerformanceReview({
   reviews,
-  setReviews,
+  setReview,
 }: {
   reviews: Record<string, Review>;
-  setReviews: (r: Record<string, Review>) => void;
+  setReview: (code: string, value: Review) => void;
 }) {
   const [mode, setMode] = useState<"list" | "review">("list");
   const [idx, setIdx] = useState(0);
@@ -105,7 +105,7 @@ export function PerformanceReview({
   return (
     <ReviewCarousel
       reviews={reviews}
-      setReviews={setReviews}
+      setReview={setReview}
       statuses={statuses}
       startIndex={idx}
       onBack={() => setMode("list")}
@@ -279,14 +279,14 @@ function StatusChip({ status }: { status: OpStatus }) {
 
 function ReviewCarousel({
   reviews,
-  setReviews,
+  setReview,
   statuses,
   startIndex,
   onBack,
   onVerdict,
 }: {
   reviews: Record<string, Review>;
-  setReviews: (r: Record<string, Review>) => void;
+  setReview: (code: string, value: Review) => void;
   statuses: Record<string, OpStatus>;
   startIndex: number;
   onBack: () => void;
@@ -307,9 +307,9 @@ function ReviewCarousel({
     onSelect();
   }, [embla]);
 
-  const setReview = (code: string, patch: Partial<Review>) => {
+  const applyPatch = (code: string, patch: Partial<Review>) => {
     const cur = reviews[code] ?? { score: null, tags: [], note: "" };
-    setReviews({ ...reviews, [code]: { ...cur, ...patch } });
+    setReview(code, { ...cur, ...patch });
   };
   const closedCount = OPERATIONS.filter((o) =>
     ["done", "expired"].includes(statuses[o.code]),
@@ -366,7 +366,7 @@ function ReviewCarousel({
                   op={op}
                   status={statuses[op.code]}
                   review={reviews[op.code] ?? { score: null, tags: [], note: "" }}
-                  onChange={(p) => setReview(op.code, p)}
+                  onChange={(p) => applyPatch(op.code, p)}
                 />
               </div>
             ))}
