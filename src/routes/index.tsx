@@ -5,7 +5,7 @@ import { Dossier } from "@/components/Dossier";
 import { Operations } from "@/components/Operations";
 import { PerformanceReview } from "@/components/PerformanceReview";
 import { useLocalState } from "@/lib/use-local-state";
-import { EMPTY_REVIEWS, type Review } from "@/lib/operations";
+import { EMPTY_REVIEWS, isShotScore, type Review } from "@/lib/operations";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,7 +38,7 @@ function Home() {
   const [reviews, setReviews] = useLocalState<Record<string, Review>>("reviews:v1", EMPTY_REVIEWS);
 
   const reviewShots = useMemo(
-    () => Object.values(reviews).reduce((n, x) => n + (x.score === 0 || x.score === 1 ? 1 : 0), 0),
+    () => Object.values(reviews).reduce((n, x) => n + (isShotScore(x.score) ? 1 : 0), 0),
     [reviews],
   );
   const totalShots = shots + reviewShots;

@@ -88,15 +88,58 @@ export const OPERATIONS: Operation[] = [
 ];
 
 export const SCORE_SCALE = [
-  { v: 0, label: "Fallimento critico", desc: "Giro di shot per tutto il Board, a spese del CEO.", tone: "bad" as const },
-  { v: 1, label: "Performance insufficiente", desc: "Shot per il CEO, a sue spese.", tone: "bad" as const },
-  { v: 2, label: "Approvazione con riserva", desc: "Passa, ma resta agli atti del Board.", tone: "mid" as const },
-  { v: 3, label: "Approvazione standard", desc: "Operation approvata senza obiezioni formali.", tone: "ok" as const },
-  { v: 4, label: "Approvazione con merito", desc: "Operation approvata, con stima del Board.", tone: "good" as const },
-  { v: 5, label: "Performance eccellente", desc: "Drink per il CEO, offre il Board.", tone: "good" as const },
+  {
+    v: 0,
+    label: "Fallimento critico",
+    desc: "Giro di shot per tutto il Board, a spese del CEO.",
+    tone: "bad" as const,
+  },
+  {
+    v: 1,
+    label: "Performance insufficiente",
+    desc: "Shot per il CEO, a sue spese.",
+    tone: "bad" as const,
+  },
+  {
+    v: 2,
+    label: "Approvazione con riserva",
+    desc: "Passa, ma resta agli atti del Board.",
+    tone: "mid" as const,
+  },
+  {
+    v: 3,
+    label: "Approvazione standard",
+    desc: "Operation approvata senza obiezioni formali.",
+    tone: "ok" as const,
+  },
+  {
+    v: 4,
+    label: "Approvazione con merito",
+    desc: "Shot per il CEO, offre il Board.",
+    tone: "good" as const,
+  },
+  {
+    v: 5,
+    label: "Performance eccellente",
+    desc: "Drink per il CEO, offre il Board.",
+    tone: "good" as const,
+  },
 ];
 
-export const QUICK_TAGS = ["epico", "scena muta", "imbarazzante", "rivedibile", "leggendario", "da rimuovere dagli atti"];
+// Scores that put a shot on the CEO — counted in the "Shot CEO" tally.
+// 0 e 1 a sue spese, 4 lo offre il Board, ma il CEO beve comunque.
+export const SHOT_SCORES = [0, 1, 4];
+export const isShotScore = (score: number | null | undefined): boolean =>
+  score != null && SHOT_SCORES.includes(score);
+
+export const QUICK_TAGS = [
+  "epico",
+  "scena muta",
+  "imbarazzante",
+  "rivedibile",
+  "leggendario",
+  "da rimuovere dagli atti",
+];
 
 // Shared types for review state
 export type Review = { score: number | null; tags: string[]; note: string };
