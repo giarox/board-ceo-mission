@@ -29,7 +29,7 @@ export const OPERATIONS: Operation[] = [
     activation:
       "Giacomo, in qualità di CEO, il Board ti richiede di convincere investitori esteri, visto il chiaro e documentato fallimento sul mercato italiano.",
     briefing:
-      "Devi ottenere approvazioni da sconosciuti in qualunque forma riconoscibile: firme su un foglio, 'yes' a voce, pollici alzati, selfie, video o conferme vagamente credibili. La qualità è negoziabile, la quantità no.",
+      "Devi ottenere approvazioni da sconosciuti in qualunque forma riconoscibile: firme, 'yes' a voce, pollici alzati, high five, foto, selfie, video o conferme vagamente credibili. La qualità è negoziabile, la quantità no.",
     success:
       "Raccogliere almeno 5 approvazioni esterne valide, da persone diverse e visibilmente coscienti.",
   },
@@ -84,9 +84,9 @@ export const OPERATIONS: Operation[] = [
     activation:
       "Giacomo, in qualità di CEO, il Board ti richiede di prenderti finalmente le tue responsabilità e testare in prima persona il prodotto che ha fatto fuori gli ultimi due stagisti.",
     briefing:
-      "Devi assaggiare il cocktail preparato dal Board e fornire una valutazione tecnica strutturata, sobria almeno nella forma.",
+      "Devi assaggiare il prodotto preparato dal Board e fornire una valutazione tecnica strutturata, sobria almeno nella forma.",
     success:
-      "Indovinare almeno 2 componenti del cocktail. Le bestemmie non contano come ingredienti.",
+      "Indovinare almeno 2 componenti del prodotto. Le bestemmie non contano come ingredienti.",
   },
 ];
 
