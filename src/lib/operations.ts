@@ -16,11 +16,11 @@ export const OPERATIONS: Operation[] = [
     limitMin: 5,
     noTimer: true,
     activation:
-      "Giacomo, in qualità di CEO, da questo momento sei ufficialmente tracciabile, valutabile e — se necessario — sostituibile senza preavviso.",
+      "Giacomo, in qualità di CEO, il Board ti comunica che da questo momento sei ufficialmente sotto attenta valutazione: devi essere sempre tracciabile e perdi ogni potere decisionale",
     briefing:
-      "Devi indossare badge e dotazione ufficiale per tutta la durata delle Operation. Non sono ammessi rimaneggiamenti creativi, occultamenti strategici o smarrimenti accidentali.",
+      "Tutti i membri del Board devono indossare il badge ufficiale fino alla fine del Summit. L’attivazione dei badge viene sancita da uno shot inaugurale, che certifica l’inizio operativo del Marriage Acquisition Summit 2026.",
     success:
-      "Mantenere badge e dotazione visibili, integri e operativi fino alla fine della giornata. Il Board si riserva controlli a campione.",
+      "Tutti i badge devono tornare a casa. Chi perde, dimentica o distrugge il badge offre uno shot a tutto il Board.",
   },
   {
     code: "OP-02",
