@@ -110,17 +110,17 @@ export function Dossier() {
                   </div>
                   <p className="mt-1 text-[15px] leading-relaxed text-ink-soft">{s.d}</p>
                   {s.t === "Performance Review" && (
-                    <div className="mt-4 rounded-lg border border-border bg-paper-2 p-3">
+                    <div className="mt-4 rounded-xl border border-border bg-paper-2 p-3">
                       <div className="font-display text-base text-ink">Rating Framework</div>
-                      <div className="mt-3 grid grid-cols-2 gap-2">
+                      <div className="mt-3 space-y-2">
                         {SCORE_SCALE.map((score) => (
                           <div
                             key={score.v}
-                            className="flex items-center gap-2 rounded-md bg-card px-2 py-2"
+                            className="flex items-start gap-3 rounded-lg bg-card p-2.5"
                           >
                             <span
                               className={
-                                "font-display flex h-8 w-8 shrink-0 items-center justify-center rounded text-base text-white " +
+                                "font-display flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg text-white " +
                                 (score.tone === "bad"
                                   ? "bg-stamp"
                                   : score.tone === "mid"
@@ -132,9 +132,14 @@ export function Dossier() {
                             >
                               {score.v}
                             </span>
-                            <span className="text-[12px] leading-tight text-ink-soft">
-                              {score.label}
-                            </span>
+                            <div className="min-w-0">
+                              <div className="text-[14px] font-semibold leading-snug text-ink">
+                                {score.label}
+                              </div>
+                              <div className="mt-0.5 text-[13px] leading-snug text-ink-soft">
+                                {score.desc}
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
