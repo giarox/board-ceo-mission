@@ -219,11 +219,11 @@ function ListView({
           disabled={!canCreateVerdict}
           className="btn btn-xl btn-primary mt-6 w-full"
         >
-          Crea esito
+          Effettua review
         </button>
         {!canCreateVerdict ? (
           <p className="mt-2.5 text-center text-[13px] leading-relaxed text-ink-soft">
-            Chiudi almeno una Operation o inserisci un voto per creare l'esito.
+            Chiudi almeno una Operation o inserisci un voto per effettuare la review.
           </p>
         ) : (
           <p className="mt-2.5 text-center text-[13px] leading-relaxed text-ink-soft">
@@ -326,10 +326,7 @@ function ReviewCarousel({
   return (
     <section className="bg-paper-2 px-5 pb-16 pt-12">
       <div className="mx-auto max-w-xl">
-        <button onClick={onBack} className="btn btn-outline-dark w-full text-base">
-          <ChevronLeft className="h-5 w-5" /> Torna all'indice review
-        </button>
-        <div className="mt-3 flex items-center justify-between gap-2 eyebrow text-ink-soft">
+        <div className="flex items-center justify-between gap-2 eyebrow text-ink-soft">
           <span>DOC-006 · Performance Review</span>
           <span>
             {index + 1} / {OPERATIONS.length}
@@ -340,8 +337,13 @@ function ReviewCarousel({
           Scorri le schede, assegna un voto e modifica tutto quando serve.
         </p>
 
+        {/* back to index — sits right on top of the cards */}
+        <button onClick={onBack} className="btn btn-outline-dark mt-6 w-full text-base">
+          <ChevronLeft className="h-5 w-5" /> Torna all'indice review
+        </button>
+
         {/* arrows + counter — stesso pattern di Operation */}
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between">
           <button
             onClick={() => embla?.scrollPrev()}
             disabled={index === 0}
@@ -404,11 +406,11 @@ function ReviewCarousel({
           disabled={!canCreateVerdict}
           className="btn btn-xl btn-primary mt-6 w-full"
         >
-          Crea esito
+          Effettua review
         </button>
         {!canCreateVerdict && (
           <p className="mt-2.5 text-center text-[13px] leading-relaxed text-ink-soft">
-            Chiudi almeno una Operation o inserisci un voto prima di creare l'esito.
+            Chiudi almeno una Operation o inserisci un voto prima di effettuare la review.
           </p>
         )}
       </div>
@@ -449,9 +451,9 @@ function ReviewCard({
           {review.score != null && (
             <button
               onClick={() => onChange({ score: null })}
-              className="btn-chip border-2 border-stamp bg-stamp/10 text-stamp"
+              className="inline-flex min-h-9 items-center gap-1 px-1 text-[13px] font-semibold text-stamp active:scale-95"
             >
-              <X className="h-4 w-4" /> Cancella voto
+              <X className="h-4 w-4" /> Cancella
             </button>
           )}
         </div>
@@ -484,14 +486,18 @@ function ReviewCard({
         </div>
         {review.score != null && (
           <div className="mt-3 rounded-xl bg-ink/5 px-3.5 py-2.5 text-[14px] leading-relaxed text-ink">
-            <span className="font-display">{review.score}</span> — {SCORE_SCALE[review.score].label}
-            . <span className="text-ink-soft">{SCORE_SCALE[review.score].desc}</span>
+            <span className="font-display">{review.score}</span>
+            {` — ${SCORE_SCALE[review.score].label}. `}
+            <span className="text-ink-soft">{SCORE_SCALE[review.score].desc}</span>
           </div>
         )}
       </div>
 
       <div className="mt-6">
-        <div className="eyebrow text-[10px] text-ink-soft">Tag rapidi (opzionale)</div>
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="eyebrow text-[10px] text-ink-soft">Tag rapidi</div>
+          <div className="text-[11px] text-ink-soft/70">tocca per selezionare</div>
+        </div>
         <div className="mt-2.5 flex flex-wrap gap-2">
           {QUICK_TAGS.map((t) => {
             const active = review.tags.includes(t);
@@ -514,25 +520,27 @@ function ReviewCard({
         </div>
       </div>
 
-      <details className="mt-6 rounded-xl bg-paper-2 p-3">
-        <summary className="eyebrow flex min-h-9 cursor-pointer list-none items-center text-ink-soft">
-          Note libere (opzionale)
-        </summary>
+      <div className="mt-6">
+        <label htmlFor={`note-${op.code}`} className="flex items-baseline justify-between gap-2">
+          <span className="eyebrow text-[10px] text-ink-soft">Note libere</span>
+          <span className="text-[11px] text-ink-soft/70">scrivi a mano</span>
+        </label>
         <textarea
+          id={`note-${op.code}`}
           value={review.note}
           onChange={(e) => onChange({ note: e.target.value })}
           placeholder="Verbalizza, se ne hai la forza."
           rows={3}
-          className="mt-2 w-full resize-none rounded-lg border border-border bg-card p-3 text-[15px] outline-none focus:ring-2 focus:ring-night"
+          className="mt-2.5 w-full resize-none rounded-xl border-2 border-border bg-paper-2 p-3.5 text-[15px] leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-soft/60 focus:border-night focus:bg-card"
         />
-      </details>
+      </div>
 
       {hasInput && (
         <button
           onClick={clearReview}
-          className="btn mt-5 w-full border-2 border-stamp bg-stamp/10 text-base text-stamp"
+          className="btn-chip mt-5 ml-auto flex border border-stamp/40 bg-stamp/5 text-stamp"
         >
-          <RotateCcw className="h-4 w-4" /> Cancella scheda review
+          <RotateCcw className="h-3.5 w-3.5" /> Cancella scheda review
         </button>
       )}
     </article>
