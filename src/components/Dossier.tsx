@@ -67,7 +67,7 @@ export function Dossier() {
       <section className="bg-paper-2 px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-003" name="Protocollo Operativo" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Come funziona</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Iter Operativo</h2>
 
           <ol className="mt-6 space-y-4">
             {[
