@@ -34,7 +34,7 @@ export function Operations({
         <div className="font-mono-tight text-[11px] uppercase tracking-[0.18em] text-paper/60">
           DOC-005 · Operation
         </div>
-        <h2 className="font-display mt-2 text-3xl">Agenda Operativa</h2>
+        <h2 className="font-display mt-2 text-3xl">Operations Agenda</h2>
         <p className="mt-1 text-[14px] text-paper/70">
           Sette Operation ufficiali. Il Board ne attiva quante vuole, quando vuole,
           se ritiene situazione, luogo e vibe favorevoli. Scorri per consultarle.
@@ -71,7 +71,11 @@ export function Operations({
                 key={op.code}
                 className="min-w-0 flex-[0_0_88%]"
               >
-                <OpCard op={op} onExpire={() => setShots((s) => s + 1)} />
+                <OpCard
+                  op={op}
+                  onExpire={() => setShots((s) => s + 1)}
+                  onUndoExpire={() => setShots((s) => Math.max(0, s - 1))}
+                />
               </div>
             ))}
           </div>
@@ -96,7 +100,15 @@ export function Operations({
   );
 }
 
-function OpCard({ op, onExpire }: { op: Operation; onExpire: () => void }) {
+function OpCard({
+  op,
+  onExpire,
+  onUndoExpire,
+}: {
+  op: Operation;
+  onExpire: () => void;
+  onUndoExpire: () => void;
+}) {
   const [state, setState] = useLocalState<OpRuntime>(`op:${op.code}`, EMPTY_OP_RUNTIME);
   const [now, setNow] = useState(() => Date.now());
   const expiredFiredRef = useRef(false);
@@ -126,7 +138,10 @@ function OpCard({ op, onExpire }: { op: Operation; onExpire: () => void }) {
     const used = Date.now() - (state.startedAt ?? Date.now());
     setState({ elapsedMs: used, startedAt: null, expired: false });
   };
-  const reset = () => setState(EMPTY_OP_RUNTIME);
+  const reset = () => {
+    if (state.expired) onUndoExpire();
+    setState(EMPTY_OP_RUNTIME);
+  };
 
   const display = state.elapsedMs != null ? state.elapsedMs : remainingMs;
 
@@ -154,9 +169,12 @@ function OpCard({ op, onExpire }: { op: Operation; onExpire: () => void }) {
             <div className="font-mono-tight text-[10px] uppercase tracking-widest text-ink-soft">
               {state.elapsedMs != null ? "Tempo registrato" : running ? "Tempo rimanente" : "Pronto"}
             </div>
-            {(state.elapsedMs != null || state.expired) && (
-              <button onClick={reset} className="flex items-center gap-1 text-[12px] text-ink-soft active:scale-95">
-                <RotateCcw className="h-3.5 w-3.5" /> reset
+            {(running || state.elapsedMs != null || state.expired) && (
+              <button
+                onClick={reset}
+                className="flex items-center gap-1 rounded-md border border-border bg-paper-2 px-2 py-1 text-[12px] font-semibold text-ink active:scale-95"
+              >
+                <RotateCcw className="h-3.5 w-3.5" /> undo
               </button>
             )}
           </div>

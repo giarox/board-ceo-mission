@@ -39,7 +39,7 @@ export function Dossier() {
       <section className="paper-grain px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-002" name="Executive Brief" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Mandato del Board</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Board Mandate</h2>
           <p className="mt-4 text-[17px] leading-relaxed text-ink">
             Il Board si riunisce a Berlino per verificare se Giacomo Palazzo, in qualità di CEO,
             sia effettivamente pronto alla fase finale della Marriage Acquisition o se sia
@@ -66,17 +66,17 @@ export function Dossier() {
       {/* PROTOCOL — paper alt */}
       <section className="bg-paper-2 px-6 py-14">
         <div className="mx-auto max-w-xl">
-          <SectionLabel code="DOC-003" name="Protocollo Operativo" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Iter Operativo</h2>
+          <SectionLabel code="DOC-003" name="Operating Protocol" />
+          <h2 className="font-display mt-3 text-3xl text-ink">Operations Agenda</h2>
 
           <ol className="mt-6 space-y-4">
             {[
               {
-                t: "Attivazione",
+                t: "Activation",
                 d: "Il Board può attivare quante Operation vuole, quando vuole, se ritiene che situazione, luogo e vibe siano favorevoli. L'ordine non è vincolante, il buon gusto neppure.",
               },
               {
-                t: "Verifica Operativa Immediata",
+                t: "Live Verification",
                 d: "Ogni Operation ha un tempo limite, fissato e visibile nel dossier. Se entro il tempo non c'è progresso credibile: shot per il CEO, a sue spese, senza diritto di replica.",
               },
               {
@@ -101,7 +101,7 @@ export function Dossier() {
       {/* SCALE — paper */}
       <section className="paper-grain px-6 py-14">
         <div className="mx-auto max-w-xl">
-          <SectionLabel code="DOC-004" name="Scala Ufficiale di Valutazione" />
+          <SectionLabel code="DOC-004" name="Official Rating Scale" />
           <h2 className="font-display mt-3 text-3xl text-ink">Rating Framework</h2>
           <p className="mt-2 text-[15px] text-ink-soft">
             Ogni voto ha una conseguenza operativa precisa, vincolante e non rimborsabile.

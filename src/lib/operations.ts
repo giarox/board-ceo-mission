@@ -123,8 +123,8 @@ export function statusFromRuntime(s: OpRuntime | null | undefined): OpStatus {
 }
 
 export const STATUS_LABEL: Record<OpStatus, string> = {
-  idle: "Da avviare",
-  running: "In corso",
-  done: "Completata",
-  expired: "Tempo scaduto",
+  idle: "Pending",
+  running: "Live",
+  done: "Closed",
+  expired: "Timed out",
 };

@@ -16,6 +16,7 @@ export function useLocalState<T>(key: string, initial: T) {
     if (!hydrated) return;
     try {
       localStorage.setItem(key, JSON.stringify(value));
+      window.dispatchEvent(new CustomEvent("mas:local-state-change", { detail: { key } }));
     } catch {}
   }, [key, value, hydrated]);
 

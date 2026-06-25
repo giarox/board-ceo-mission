@@ -26,11 +26,13 @@ export function useAllOpRuntimes() {
     setMap(readAll());
     const refresh = () => setMap(readAll());
     window.addEventListener("storage", refresh);
+    window.addEventListener("mas:local-state-change", refresh);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     const t = setInterval(refresh, 1000);
     return () => {
       window.removeEventListener("storage", refresh);
+      window.removeEventListener("mas:local-state-change", refresh);
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
       clearInterval(t);
