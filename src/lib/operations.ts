@@ -161,10 +161,12 @@ export const EMPTY_OP_RUNTIME: OpRuntime = { elapsedMs: null, startedAt: null, e
 export type OpStatus = "idle" | "running" | "done" | "expired";
 
 export function statusFromRuntime(s: OpRuntime | null | undefined): OpStatus {
+  // Use == null so a missing field (Realtime DB drops null/empty values on
+  // write) reads the same as an explicit null.
   if (!s) return "idle";
   if (s.expired) return "expired";
-  if (s.startedAt !== null && s.elapsedMs === null) return "running";
-  if (s.elapsedMs !== null) return "done";
+  if (s.startedAt != null && s.elapsedMs == null) return "running";
+  if (s.elapsedMs != null) return "done";
   return "idle";
 }
 

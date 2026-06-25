@@ -12,13 +12,13 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "", // e.g. https://mas2026-xxxx-default-rtdb.europe-west1.firebasedatabase.app
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyB3ClYSgsSlLlZN6fdreXkD2eziv5Y2PQ4",
+  authDomain: "mas2026-brl2026.firebaseapp.com",
+  databaseURL: "https://mas2026-brl2026-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mas2026-brl2026",
+  storageBucket: "mas2026-brl2026.firebasestorage.app",
+  messagingSenderId: "686223377682",
+  appId: "1:686223377682:web:8ab6fa98c4cd2ea461dfcb",
 };
 
 /** Live sync is on only once a Realtime Database URL is configured. */

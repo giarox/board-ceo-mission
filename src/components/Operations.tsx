@@ -4,11 +4,7 @@ import { ChevronLeft, ChevronRight, Play, Check, RotateCcw } from "lucide-react"
 import { OPERATIONS, type Operation, type OpRuntime, EMPTY_OP_RUNTIME } from "@/lib/operations";
 import { useLocalState } from "@/lib/use-local-state";
 
-export function Operations({
-  setShots,
-}: {
-  setShots: (n: number | ((p: number) => number)) => void;
-}) {
+export function Operations() {
   const [emblaRef, embla] = useEmblaCarousel({
     loop: false,
     align: "center",
@@ -61,11 +57,7 @@ export function Operations({
           <div className="flex gap-3">
             {OPERATIONS.map((op) => (
               <div key={op.code} className="min-w-0 flex-[0_0_88%]">
-                <OpCard
-                  op={op}
-                  onExpire={() => setShots((s) => s + 1)}
-                  onUndoExpire={() => setShots((s) => Math.max(0, s - 1))}
-                />
+                <OpCard op={op} />
               </div>
             ))}
           </div>
@@ -94,21 +86,14 @@ export function Operations({
   );
 }
 
-function OpCard({
-  op,
-  onExpire,
-  onUndoExpire,
-}: {
-  op: Operation;
-  onExpire: () => void;
-  onUndoExpire: () => void;
-}) {
+function OpCard({ op }: { op: Operation }) {
   const [state, setState] = useLocalState<OpRuntime>(`op:${op.code}`, EMPTY_OP_RUNTIME);
   const [now, setNow] = useState(() => Date.now());
   const expiredFiredRef = useRef(false);
 
   const totalMs = op.limitMin * 60_000;
-  const running = state.startedAt !== null && state.elapsedMs === null && !state.expired;
+  // == null so a field dropped by Realtime DB (null isn't stored) reads as null.
+  const running = state.startedAt != null && state.elapsedMs == null && !state.expired;
   const remainingMs = running ? Math.max(0, totalMs - (now - (state.startedAt ?? 0))) : totalMs;
 
   useEffect(() => {
@@ -120,8 +105,9 @@ function OpCard({
   useEffect(() => {
     if (running && remainingMs <= 0 && !expiredFiredRef.current) {
       expiredFiredRef.current = true;
+      // Just flag the op expired (idempotent across devices). The shot tally is
+      // derived from how many ops are expired, so it can't be double-counted.
       setState({ ...state, expired: true, startedAt: null });
-      onExpire();
       try {
         navigator.vibrate?.([200, 80, 200, 80, 400]);
       } catch {
@@ -138,10 +124,7 @@ function OpCard({
   };
   // No-timer ops are simply switched on; elapsedMs marks the activated state.
   const activate = () => setState({ elapsedMs: 0, startedAt: Date.now(), expired: false });
-  const reset = () => {
-    if (state.expired) onUndoExpire();
-    setState(EMPTY_OP_RUNTIME);
-  };
+  const reset = () => setState(EMPTY_OP_RUNTIME);
 
   const display = state.elapsedMs != null ? state.elapsedMs : remainingMs;
   const activated = state.elapsedMs != null;

@@ -4,7 +4,8 @@ import { FileText, Target, ClipboardCheck } from "lucide-react";
 import { Dossier } from "@/components/Dossier";
 import { Operations } from "@/components/Operations";
 import { PerformanceReview } from "@/components/PerformanceReview";
-import { useLocalState, useSharedMap } from "@/lib/use-local-state";
+import { useSharedMap } from "@/lib/use-local-state";
+import { useAllOpRuntimes } from "@/lib/op-runtime";
 import { EMPTY_REVIEWS, isShotScore, type Review } from "@/lib/operations";
 
 export const Route = createFileRoute("/")({
@@ -34,14 +35,21 @@ const TABS: { id: SectionId; label: string; Icon: typeof FileText }[] = [
 ];
 
 function Home() {
-  const [shots, setShots] = useLocalState<number>("shots:timers", 0);
   const [reviews, setReview] = useSharedMap<Review>("reviews:v1", EMPTY_REVIEWS);
+  const runtimes = useAllOpRuntimes();
 
+  // Shots owed by the CEO, all derived from shared state so every device agrees
+  // and nothing is double-counted: one per expired (un-acknowledged) timer,
+  // plus one per low/penalty review score.
+  const timerShots = useMemo(
+    () => Object.values(runtimes).filter((r) => r?.expired).length,
+    [runtimes],
+  );
   const reviewShots = useMemo(
     () => Object.values(reviews).reduce((n, x) => n + (isShotScore(x.score) ? 1 : 0), 0),
     [reviews],
   );
-  const totalShots = shots + reviewShots;
+  const totalShots = timerShots + reviewShots;
 
   const refs = {
     dossier: useRef<HTMLDivElement>(null),
@@ -122,7 +130,7 @@ function Home() {
         <Dossier />
       </div>
       <div ref={refs.operation} data-section="operation">
-        <Operations setShots={setShots} />
+        <Operations />
       </div>
       <div ref={refs.review} data-section="review">
         <PerformanceReview reviews={reviews} setReview={setReview} />
