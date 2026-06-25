@@ -73,14 +73,17 @@ export function Dossier() {
             {[
               {
                 t: "Activation",
+                tag: null,
                 d: "Il Board può attivare quante Operation vuole, quando vuole, se ritiene che situazione, luogo e vibe siano favorevoli. L'ordine non è vincolante, il buon gusto neppure.",
               },
               {
-                t: "Live Verification",
+                t: "Verifica Operativa Immediata",
+                tag: "LIVE",
                 d: "Ogni Operation ha un tempo limite, fissato e visibile nel dossier. Se entro il tempo non c'è progresso credibile: shot per il CEO, a sue spese, senza diritto di replica.",
               },
               {
                 t: "Performance Review",
+                tag: "DAY AFTER",
                 d: "Il giorno dopo, riuniti e indolenziti, il Board vota ogni Operation da 0 a 5. Voto basso, paga il CEO. Voto alto, paga il Board. Il pareggio non esiste.",
               },
             ].map((s, i) => (
@@ -89,51 +92,50 @@ export function Dossier() {
                   {i + 1}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-display text-lg leading-tight text-ink">{s.t}</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="font-display text-lg leading-tight text-ink">{s.t}</div>
+                    {s.tag && (
+                      <span className="rounded-md bg-night px-2 py-1 font-mono-tight text-[9px] font-bold uppercase tracking-widest text-paper">
+                        {s.tag}
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-1 text-[15px] leading-relaxed text-ink-soft">{s.d}</p>
+                  {s.t === "Performance Review" && (
+                    <div className="mt-4 rounded-lg border border-border bg-paper-2 p-3">
+                      <div className="font-display text-base text-ink">Rating Framework</div>
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        {SCORE_SCALE.map((score) => (
+                          <div
+                            key={score.v}
+                            className="flex items-center gap-2 rounded-md bg-card px-2 py-2"
+                          >
+                            <span
+                              className={
+                                "font-display flex h-8 w-8 shrink-0 items-center justify-center rounded text-base text-white " +
+                                (score.tone === "bad"
+                                  ? "bg-stamp"
+                                  : score.tone === "mid"
+                                    ? "bg-warn text-ink"
+                                    : score.tone === "ok"
+                                      ? "bg-night"
+                                      : "bg-approve")
+                              }
+                            >
+                              {score.v}
+                            </span>
+                            <span className="text-[12px] leading-tight text-ink-soft">
+                              {score.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </li>
             ))}
           </ol>
-        </div>
-      </section>
-
-      {/* SCALE — paper */}
-      <section className="paper-grain px-6 py-14">
-        <div className="mx-auto max-w-xl">
-          <SectionLabel code="DOC-004" name="Official Rating Scale" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Rating Framework</h2>
-          <p className="mt-2 text-[15px] text-ink-soft">
-            Ogni voto ha una conseguenza operativa precisa, vincolante e non rimborsabile.
-          </p>
-
-          <div className="mt-6 space-y-3">
-            {SCORE_SCALE.map((s) => (
-              <div
-                key={s.v}
-                className="flex items-stretch gap-4 overflow-hidden rounded-lg border border-border bg-card"
-              >
-                <div
-                  className={
-                    "font-display flex w-16 shrink-0 items-center justify-center text-3xl text-white " +
-                    (s.tone === "bad"
-                      ? "bg-stamp"
-                      : s.tone === "mid"
-                        ? "bg-warn text-ink"
-                        : s.tone === "ok"
-                          ? "bg-night"
-                          : "bg-approve")
-                  }
-                >
-                  {s.v}
-                </div>
-                <div className="min-w-0 py-3 pr-4">
-                  <div className="font-display text-base leading-tight text-ink">{s.label}</div>
-                  <div className="mt-0.5 text-[14px] leading-snug text-ink-soft">{s.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     </div>

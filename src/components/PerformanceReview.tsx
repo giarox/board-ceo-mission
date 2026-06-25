@@ -165,10 +165,10 @@ function ListView({
             {votedCount} / {OPERATIONS.length} valutate
           </span>
         </div>
-        <h2 className="font-display mt-2 text-3xl text-ink">Performance Index</h2>
+        <h2 className="font-display mt-2 text-3xl text-ink">Performance Review</h2>
         <p className="mt-1 text-[14px] leading-snug text-ink-soft">
-          Tap an Operation to open its review card. Closed or active Operations stay
-          on top, so the Board can move fast.
+          Tocca una Operation per aprire la scheda di valutazione. Quelle attive
+          o concluse restano in cima, così il Board decide senza perdere tempo.
         </p>
 
         {/* Counters */}
@@ -209,7 +209,7 @@ function ListView({
                     </div>
                   </div>
                   <span className="flex shrink-0 items-center gap-1 rounded-lg bg-night px-3 py-2 font-mono-tight text-[10px] uppercase tracking-widest text-paper">
-                    Open
+                    Apri
                     <ArrowRight className="h-4 w-4" />
                   </span>
                 </button>
@@ -224,17 +224,16 @@ function ListView({
           disabled={!canCreateVerdict}
           className="font-display mt-6 flex h-16 w-full items-center justify-center gap-2 rounded-xl bg-night text-xl text-paper active:scale-[0.98] disabled:opacity-40"
         >
-          Create Verdict
+          Crea esito
         </button>
         {!canCreateVerdict ? (
           <p className="mt-2 text-center text-[12px] text-ink-soft">
-            Close at least one Operation or add one rating to generate the Board outcome.
+            Chiudi almeno una Operation o inserisci un voto per creare l'esito.
           </p>
         ) : (
           <p className="mt-2 text-center text-[12px] text-ink-soft">
-            The Board can deliberate with {closedCount} closed Operation
-            {closedCount === 1 ? "" : "s"} and {votedCount} rating
-            {votedCount === 1 ? "" : "s"}.
+            Il Board può deliberare con {closedCount} Operation concluse e{" "}
+            {votedCount} valutazioni.
           </p>
         )}
 
@@ -350,20 +349,23 @@ function ReviewCarousel({
   return (
     <section className="bg-paper-2 px-4 pb-16 pt-10">
       <div className="mx-auto max-w-xl">
-        <div className="flex items-center justify-between font-mono-tight text-[11px] uppercase tracking-[0.18em] text-ink-soft">
+        <div className="space-y-3">
           <button
             onClick={onBack}
-            className="flex items-center gap-1 rounded-md bg-ink/5 px-2 py-1 hover:bg-ink/10 active:scale-95"
+            className="font-display flex h-13 w-full items-center justify-center gap-2 rounded-xl border-2 border-night bg-card px-4 text-base text-night active:scale-[0.98]"
           >
-            <ChevronLeft className="h-4 w-4" /> Indice
+            <ChevronLeft className="h-5 w-5" /> Torna all'indice review
           </button>
-          <span>
-            {index + 1} / {OPERATIONS.length}
-          </span>
+          <div className="flex items-center justify-between px-1 font-mono-tight text-[11px] uppercase tracking-[0.18em] text-ink-soft">
+            <span>DOC-006 · Performance Review</span>
+            <span>
+              {index + 1} / {OPERATIONS.length}
+            </span>
+          </div>
         </div>
         <h2 className="font-display mt-2 px-1 text-3xl text-ink">Performance Review</h2>
         <p className="mt-1 px-1 text-[14px] text-ink-soft">
-          Swipe through the cards, rate what happened, and keep every entry editable.
+          Scorri le schede, assegna un voto e modifica tutto quando serve.
         </p>
 
         {/* arrows + counter — stesso pattern di Operation */}
@@ -432,11 +434,11 @@ function ReviewCarousel({
           disabled={!canCreateVerdict}
           className="font-display mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-night bg-card text-lg text-night active:scale-[0.98] disabled:opacity-40"
         >
-          Create Verdict
+          Crea esito
         </button>
         {!canCreateVerdict && (
           <p className="mt-2 text-center text-[12px] text-ink-soft">
-            Close at least one Operation or add one rating before creating the outcome.
+            Chiudi almeno una Operation o inserisci un voto prima di creare l'esito.
           </p>
         )}
       </div>
@@ -486,9 +488,9 @@ function ReviewCard({
           {review.score != null && (
             <button
               onClick={() => onChange({ score: null })}
-              className="flex items-center gap-1 rounded-md border border-border bg-paper-2 px-2 py-1 text-[12px] font-semibold text-ink active:scale-95"
+              className="flex items-center gap-1 rounded-lg border-2 border-stamp bg-stamp/10 px-3 py-2 text-[13px] font-bold text-stamp active:scale-95"
             >
-              <X className="h-3.5 w-3.5" /> clear
+              <X className="h-4 w-4" /> Cancella voto
             </button>
           )}
         </div>
@@ -528,7 +530,7 @@ function ReviewCard({
 
       <div className="mt-5">
         <div className="font-mono-tight text-[10px] uppercase tracking-widest text-ink-soft">
-          Quick Tags (optional)
+          Tag rapidi (opzionale)
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {QUICK_TAGS.map((t) => {
@@ -553,7 +555,7 @@ function ReviewCard({
 
       <details className="mt-5 rounded-lg bg-paper-2 p-3">
         <summary className="font-mono-tight cursor-pointer text-[11px] uppercase tracking-widest text-ink-soft">
-          Free Notes (optional)
+          Note libere (opzionale)
         </summary>
         <textarea
           value={review.note}
@@ -569,7 +571,7 @@ function ReviewCard({
           onClick={clearReview}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-stamp bg-stamp/10 py-3 font-display text-base text-stamp active:scale-[0.98]"
         >
-          <RotateCcw className="h-4 w-4" /> Reset Review Card
+          <RotateCcw className="h-4 w-4" /> Cancella scheda review
         </button>
       )}
     </article>

@@ -165,6 +165,14 @@ function OpCard({
 
         {/* Timer */}
         <div className="mt-5 rounded-xl border border-border bg-card p-4">
+          <div className="mb-3 rounded-lg border border-stamp/35 bg-stamp/10 px-3 py-2 text-center">
+            <span className="font-mono-tight text-[10px] uppercase tracking-widest text-stamp">
+              Verifica entro
+            </span>
+            <span className="font-display ml-2 text-lg text-ink">
+              {op.limitMin} min
+            </span>
+          </div>
           <div className="flex items-center justify-between">
             <div className="font-mono-tight text-[10px] uppercase tracking-widest text-ink-soft">
               {state.elapsedMs != null ? "Tempo registrato" : running ? "Tempo rimanente" : "Pronto"}
@@ -174,7 +182,7 @@ function OpCard({
                 onClick={reset}
                 className="flex items-center gap-1 rounded-md border border-border bg-paper-2 px-2 py-1 text-[12px] font-semibold text-ink active:scale-95"
               >
-                <RotateCcw className="h-3.5 w-3.5" /> undo
+                <RotateCcw className="h-3.5 w-3.5" /> annulla
               </button>
             )}
           </div>
