@@ -38,7 +38,7 @@ export function Dossier() {
           <div className="mt-10 rounded-lg border border-paper/15 bg-paper/[0.04] p-5 backdrop-blur-sm">
             <DataRow
               k="Oggetto"
-              v="Valutazione operativa dell'asset Giacomo Palazzo in vista della Marriage Acquisition."
+              v="Valutazione operativa del CEO Giacomo Palazzo in vista della Marriage Acquisition."
             />
             <DataRow
               k="Headquarters"
@@ -52,8 +52,12 @@ export function Dossier() {
                 </>
               }
             />
-            <DataRow k="Checkout Protocol" v="Checkout: 11:00" />
-            <DataRow k="Return Flight" v="Volo di ritorno: 14:30" last />
+            <DataRow k="Checkout Protocol" v="Fuori dall'ostello per le 11:00" />
+            <DataRow
+              k="Return Flight"
+              v="Essere all'aereoporto circa 2 ore prima delle 14:30"
+              last
+            />
           </div>
 
           <p className="font-mono-tight mt-8 text-[11px] leading-relaxed text-paper/55">
