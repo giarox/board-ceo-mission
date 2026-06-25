@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { SCORE_SCALE } from "@/lib/operations";
+import { AdminPanel } from "@/components/AdminPanel";
 
 export function Dossier() {
+  const [adminOpen, setAdminOpen] = useState(false);
   return (
     <div className="flex flex-col">
       {/* COVER — night */}
@@ -12,7 +15,15 @@ export function Dossier() {
           </div>
 
           <div className="mt-8 flex justify-end">
-            <span className="stamp-box text-sm">Riservato</span>
+            {/* Secret Board admin trigger — looks like a plain stamp. */}
+            <button
+              type="button"
+              onClick={() => setAdminOpen(true)}
+              aria-label="Riservato"
+              className="stamp-box text-sm transition-opacity active:opacity-70"
+            >
+              Riservato
+            </button>
           </div>
 
           <h1 className="font-display mt-6 text-[40px] leading-[0.95] sm:text-5xl">
@@ -151,6 +162,8 @@ export function Dossier() {
           </ol>
         </div>
       </section>
+
+      {adminOpen && <AdminPanel onClose={() => setAdminOpen(false)} />}
     </div>
   );
 }
