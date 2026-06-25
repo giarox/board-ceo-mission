@@ -97,3 +97,34 @@ export const SCORE_SCALE = [
 ];
 
 export const QUICK_TAGS = ["epico", "scena muta", "imbarazzante", "rivedibile", "leggendario", "da rimuovere dagli atti"];
+
+// Shared types for review state
+export type Review = { score: number | null; tags: string[]; note: string };
+export const EMPTY_REVIEWS: Record<string, Review> = Object.fromEntries(
+  OPERATIONS.map((o) => [o.code, { score: null, tags: [], note: "" }]),
+);
+
+// Operation runtime state (mirrors Operations.tsx OpCard storage)
+export type OpRuntime = {
+  elapsedMs: number | null;
+  startedAt: number | null;
+  expired: boolean;
+};
+export const EMPTY_OP_RUNTIME: OpRuntime = { elapsedMs: null, startedAt: null, expired: false };
+
+export type OpStatus = "idle" | "running" | "done" | "expired";
+
+export function statusFromRuntime(s: OpRuntime | null | undefined): OpStatus {
+  if (!s) return "idle";
+  if (s.expired) return "expired";
+  if (s.startedAt !== null && s.elapsedMs === null) return "running";
+  if (s.elapsedMs !== null) return "done";
+  return "idle";
+}
+
+export const STATUS_LABEL: Record<OpStatus, string> = {
+  idle: "Da avviare",
+  running: "In corso",
+  done: "Completata",
+  expired: "Tempo scaduto",
+};

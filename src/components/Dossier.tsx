@@ -39,7 +39,7 @@ export function Dossier() {
       <section className="paper-grain px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-002" name="Executive Brief" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Perché ci siamo riuniti</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Mandato del Board</h2>
           <p className="mt-4 text-[17px] leading-relaxed text-ink">
             Il Board si riunisce a Berlino per verificare se Giacomo Palazzo, in qualità di CEO,
             sia effettivamente pronto alla fase finale della Marriage Acquisition o se sia
@@ -67,7 +67,7 @@ export function Dossier() {
       <section className="bg-paper-2 px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-003" name="Protocollo Operativo" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Come funziona</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Iter Operativo</h2>
 
           <ol className="mt-6 space-y-4">
             {[
@@ -102,7 +102,7 @@ export function Dossier() {
       <section className="paper-grain px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-004" name="Scala Ufficiale di Valutazione" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Voto 0 — 5</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Rating Framework</h2>
           <p className="mt-2 text-[15px] text-ink-soft">
             Ogni voto ha una conseguenza operativa precisa, vincolante e non rimborsabile.
           </p>

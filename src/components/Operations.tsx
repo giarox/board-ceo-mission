@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Play, Check, RotateCcw } from "lucide-react";
-import { OPERATIONS, type Operation } from "@/lib/operations";
+import {
+  OPERATIONS,
+  type Operation,
+  type OpRuntime,
+  EMPTY_OP_RUNTIME,
+} from "@/lib/operations";
 import { useLocalState } from "@/lib/use-local-state";
 
-type OpState = {
-  // remaining seconds when paused/idle; null = idle (not started)
-  elapsedMs: number | null; // time recorded as "completed"
-  startedAt: number | null; // epoch when started, null when not running
-  expired: boolean;
-};
-
-const empty: OpState = { elapsedMs: null, startedAt: null, expired: false };
-
-export function Operations({ shots, setShots }: { shots: number; setShots: (n: number | ((p: number) => number)) => void }) {
-  const [emblaRef, embla] = useEmblaCarousel({ loop: false, align: "center" });
+export function Operations({
+  setShots,
+}: {
+  setShots: (n: number | ((p: number) => number)) => void;
+}) {
+  const [emblaRef, embla] = useEmblaCarousel({
+    loop: false,
+    align: "center",
+    containScroll: "trimSnaps",
+  });
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -25,47 +29,48 @@ export function Operations({ shots, setShots }: { shots: number; setShots: (n: n
   }, [embla]);
 
   return (
-    <section className="night-bg text-paper px-4 py-12">
+    <section className="night-bg text-paper px-4 py-10">
       <div className="mx-auto max-w-xl">
-        <div className="flex items-center justify-between">
-          <div className="font-mono-tight text-[11px] uppercase tracking-[0.18em] text-paper/60">
-            DOC-005 · Operation
-          </div>
-          <ShotCounter shots={shots} />
+        <div className="font-mono-tight text-[11px] uppercase tracking-[0.18em] text-paper/60">
+          DOC-005 · Operation
         </div>
-        <h2 className="font-display mt-2 text-3xl">Le sette missioni</h2>
+        <h2 className="font-display mt-2 text-3xl">Agenda Operativa</h2>
         <p className="mt-1 text-[14px] text-paper/70">
-          Scorri lateralmente. Una alla volta, con calma. O quasi.
+          Sette Operation ufficiali. Il Board ne attiva quante vuole, quando vuole,
+          se ritiene situazione, luogo e vibe favorevoli. Scorri per consultarle.
         </p>
 
         {/* counter + arrows */}
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-5 flex items-center justify-between">
           <button
             onClick={() => embla?.scrollPrev()}
             disabled={index === 0}
             aria-label="Operation precedente"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-paper/20 bg-paper/5 active:scale-95 disabled:opacity-30"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/20 bg-paper/5 active:scale-95 disabled:opacity-30"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <div className="font-display text-lg">
+          <div className="font-display text-lg tabular-nums">
             {index + 1} <span className="text-paper/40">/ {OPERATIONS.length}</span>
           </div>
           <button
             onClick={() => embla?.scrollNext()}
             disabled={index === OPERATIONS.length - 1}
             aria-label="Operation successiva"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-paper/20 bg-paper/5 active:scale-95 disabled:opacity-30"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/20 bg-paper/5 active:scale-95 disabled:opacity-30"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
 
-        {/* embla */}
+        {/* embla — peek both sides */}
         <div className="mt-4 overflow-hidden" ref={emblaRef}>
-          <div className="flex">
+          <div className="flex gap-3">
             {OPERATIONS.map((op) => (
-              <div key={op.code} className="min-w-0 flex-[0_0_100%] px-1">
+              <div
+                key={op.code}
+                className="min-w-0 flex-[0_0_88%]"
+              >
                 <OpCard op={op} onExpire={() => setShots((s) => s + 1)} />
               </div>
             ))}
@@ -91,19 +96,8 @@ export function Operations({ shots, setShots }: { shots: number; setShots: (n: n
   );
 }
 
-function ShotCounter({ shots }: { shots: number }) {
-  return (
-    <div className="rounded-md border-2 border-stamp bg-stamp/15 px-3 py-1.5 text-right">
-      <div className="font-mono-tight text-[9px] uppercase tracking-widest text-stamp">
-        Shot CEO
-      </div>
-      <div className="font-display text-xl leading-none text-paper">{shots}</div>
-    </div>
-  );
-}
-
 function OpCard({ op, onExpire }: { op: Operation; onExpire: () => void }) {
-  const [state, setState] = useLocalState<OpState>(`op:${op.code}`, empty);
+  const [state, setState] = useLocalState<OpRuntime>(`op:${op.code}`, EMPTY_OP_RUNTIME);
   const [now, setNow] = useState(() => Date.now());
   const expiredFiredRef = useRef(false);
 
@@ -132,7 +126,7 @@ function OpCard({ op, onExpire }: { op: Operation; onExpire: () => void }) {
     const used = Date.now() - (state.startedAt ?? Date.now());
     setState({ elapsedMs: used, startedAt: null, expired: false });
   };
-  const reset = () => setState(empty);
+  const reset = () => setState(EMPTY_OP_RUNTIME);
 
   const display = state.elapsedMs != null ? state.elapsedMs : remainingMs;
 
