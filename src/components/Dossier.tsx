@@ -102,7 +102,7 @@ export function Dossier() {
       <section className="paper-grain px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-004" name="Scala Ufficiale di Valutazione" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Voto 0 — 5</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Rating Framework</h2>
           <p className="mt-2 text-[15px] text-ink-soft">
             Ogni voto ha una conseguenza operativa precisa, vincolante e non rimborsabile.
           </p>
