@@ -13,8 +13,7 @@ export const Route = createFileRoute("/")({
       { title: "MAS 2026 — Berlin Edition" },
       {
         name: "description",
-        content:
-          "Dossier riservato del Board per il Marriage Acquisition Summit 2026 — Berlino.",
+        content: "Dossier riservato del Board per il Marriage Acquisition Summit 2026 — Berlino.",
       },
       { property: "og:title", content: "MAS 2026 — Berlin Edition" },
       {
@@ -36,17 +35,10 @@ const TABS: { id: SectionId; label: string; Icon: typeof FileText }[] = [
 
 function Home() {
   const [shots, setShots] = useLocalState<number>("shots:timers", 0);
-  const [reviews, setReviews] = useLocalState<Record<string, Review>>(
-    "reviews:v1",
-    EMPTY_REVIEWS,
-  );
+  const [reviews, setReviews] = useLocalState<Record<string, Review>>("reviews:v1", EMPTY_REVIEWS);
 
   const reviewShots = useMemo(
-    () =>
-      Object.values(reviews).reduce(
-        (n, x) => n + (x.score === 0 || x.score === 1 ? 1 : 0),
-        0,
-      ),
+    () => Object.values(reviews).reduce((n, x) => n + (x.score === 0 || x.score === 1 ? 1 : 0), 0),
     [reviews],
   );
   const totalShots = shots + reviewShots;
@@ -64,8 +56,7 @@ function Home() {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible)
-          setActive(visible.target.getAttribute("data-section") as SectionId);
+        if (visible) setActive(visible.target.getAttribute("data-section") as SectionId);
       },
       { rootMargin: "-40% 0px -40% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
@@ -76,7 +67,7 @@ function Home() {
   const go = (id: SectionId) => {
     const el = refs[id].current;
     if (!el) return;
-    const headerH = 96; // sticky header height incl. tabs
+    const headerH = 108; // sticky header height incl. tabs
     const y = el.getBoundingClientRect().top + window.scrollY - headerH + 1;
     window.scrollTo({ top: y, behavior: "smooth" });
   };
@@ -88,47 +79,37 @@ function Home() {
         className="sticky top-0 z-50 border-b border-paper/10 bg-night/95 text-paper backdrop-blur-md"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        <div className="mx-auto max-w-xl px-4">
-          <div className="flex items-center justify-between pt-2">
-            <div className="font-mono-tight text-[10px] uppercase tracking-[0.2em] text-paper/70">
+        <div className="mx-auto max-w-xl px-5">
+          <div className="flex items-center justify-between gap-3 pt-2.5">
+            <div className="eyebrow text-paper/70">
               MAS·2026 <span className="text-paper/35">/</span> Berlin
             </div>
-            <div className="flex items-center gap-2 rounded-md border-2 border-stamp bg-stamp/15 px-2.5 py-1">
-              <span className="font-mono-tight text-[9px] uppercase tracking-widest text-stamp">
-                Shot CEO
-              </span>
-              <span className="font-display text-base leading-none text-paper tabular-nums">
+            <div className="flex items-center gap-2 rounded-lg border-2 border-stamp bg-stamp/15 px-3 py-1.5">
+              <span className="eyebrow text-[10px] text-stamp">Shot CEO</span>
+              <span className="font-display text-lg leading-none text-paper tabular-nums">
                 {totalShots}
               </span>
             </div>
           </div>
-          <nav
-            className="mt-2 grid grid-cols-3 gap-1 pb-1"
-            aria-label="Sezioni"
-          >
+          <nav className="mt-2.5 grid grid-cols-3 gap-1.5 pb-2" aria-label="Sezioni">
             {TABS.map(({ id, label, Icon }) => {
               const isActive = active === id;
               return (
                 <button
                   key={id}
                   onClick={() => go(id)}
+                  aria-current={isActive ? "true" : undefined}
                   className={
-                    "relative flex items-center justify-center gap-1.5 rounded-md py-2 transition-colors active:scale-[0.97] " +
+                    "relative flex min-h-11 flex-col items-center justify-center gap-1 rounded-lg py-2 transition-colors active:scale-[0.97] " +
                     (isActive
                       ? "bg-paper/10 text-paper"
-                      : "text-paper/55 hover:text-paper/80")
+                      : "text-paper/55 hover:bg-paper/5 hover:text-paper/80")
                   }
                 >
-                  <Icon
-                    className={
-                      "h-4 w-4 " + (isActive ? "text-stamp" : "")
-                    }
-                  />
-                  <span className="font-mono-tight text-[11px] uppercase tracking-widest">
-                    {label}
-                  </span>
+                  <Icon className={"h-[18px] w-[18px] " + (isActive ? "text-stamp" : "")} />
+                  <span className="eyebrow text-[10px]">{label}</span>
                   {isActive && (
-                    <span className="absolute inset-x-3 -bottom-px h-[2px] bg-stamp" />
+                    <span className="absolute inset-x-4 -bottom-0.5 h-[2px] rounded-full bg-stamp" />
                   )}
                 </button>
               );

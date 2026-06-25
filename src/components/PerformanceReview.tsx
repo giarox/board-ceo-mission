@@ -44,10 +44,7 @@ export function PerformanceReview({
 }) {
   const [mode, setMode] = useState<"list" | "review">("list");
   const [idx, setIdx] = useState(0);
-  const [verdict, setVerdict] = useLocalState<StoredVerdict | null>(
-    "verdict:v1",
-    null,
-  );
+  const [verdict, setVerdict] = useLocalState<StoredVerdict | null>("verdict:v1", null);
 
   const runtimes = useAllOpRuntimes();
   const statuses: Record<string, OpStatus> = useMemo(() => {
@@ -136,9 +133,7 @@ function ListView({
   onClearVerdict: () => void;
 }) {
   const votedCount = OPERATIONS.filter((o) => reviews[o.code]?.score != null).length;
-  const activatedCount = OPERATIONS.filter(
-    (o) => statuses[o.code] !== "idle",
-  ).length;
+  const activatedCount = OPERATIONS.filter((o) => statuses[o.code] !== "idle").length;
   const closedCount = OPERATIONS.filter((o) =>
     ["done", "expired"].includes(statuses[o.code]),
   ).length;
@@ -149,26 +144,25 @@ function ListView({
     const score = (code: string) => {
       const voted = reviews[code]?.score != null ? 1 : 0;
       const st = statuses[code];
-      const stRank =
-        st === "running" || st === "expired" ? 0 : st === "done" ? 1 : 2;
+      const stRank = st === "running" || st === "expired" ? 0 : st === "done" ? 1 : 2;
       return voted * 10 + stRank;
     };
     return score(a.code) - score(b.code);
   });
 
   return (
-    <section className="bg-paper-2 px-5 pb-16 pt-10">
+    <section className="bg-paper-2 px-5 pb-16 pt-12">
       <div className="mx-auto max-w-xl">
-        <div className="flex items-center justify-between font-mono-tight text-[11px] uppercase tracking-[0.18em] text-ink-soft">
+        <div className="flex items-center justify-between gap-2 eyebrow text-ink-soft">
           <span>DOC-006 · Performance Review</span>
           <span>
             {votedCount} / {OPERATIONS.length} valutate
           </span>
         </div>
         <h2 className="font-display mt-2 text-3xl text-ink">Performance Review</h2>
-        <p className="mt-1 text-[14px] leading-snug text-ink-soft">
-          Tocca una Operation per aprire la scheda di valutazione. Quelle attive
-          o concluse restano in cima, così il Board decide senza perdere tempo.
+        <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-ink-soft">
+          Tocca una Operation per aprire la scheda di valutazione. Quelle attive o concluse restano
+          in cima, così il Board decide senza perdere tempo.
         </p>
 
         {/* Counters */}
@@ -189,28 +183,29 @@ function ListView({
               <li key={op.code}>
                 <button
                   onClick={() => onOpen(i)}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-border bg-card px-3.5 py-3.5 text-left shadow-[0_4px_18px_-14px_rgba(0,0,0,0.55)] transition-colors active:scale-[0.99] hover:border-night/50"
+                  aria-label={`Apri valutazione ${op.code} — ${op.name}`}
+                  className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left shadow-[0_4px_18px_-14px_rgba(0,0,0,0.55)] transition-colors active:scale-[0.99] hover:border-night/40"
                 >
                   <StatusDot status={st} voted={voted} />
                   <div className="min-w-0 flex-1">
-                    <div className="font-mono-tight text-[10px] uppercase tracking-[0.18em] text-ink-soft">
-                      {op.code}
-                    </div>
+                    <div className="eyebrow text-[10px] text-ink-soft">{op.code}</div>
                     <div className="font-display truncate text-base leading-tight text-ink">
                       {op.name}
                     </div>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[12px] text-ink-soft">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
                       <StatusChip status={st} />
                       {voted && (
-                        <span className="rounded-md bg-night px-2.5 py-1 font-mono-tight text-[10px] uppercase tracking-widest text-paper">
+                        <span className="eyebrow rounded-md bg-night px-2 py-1 text-[10px] text-paper">
                           Rating {score}
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className="flex shrink-0 items-center gap-1 rounded-lg bg-night px-3 py-2 font-mono-tight text-[10px] uppercase tracking-widest text-paper">
-                    Apri
-                    <ArrowRight className="h-4 w-4" />
+                  <span
+                    aria-hidden
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-night/10 text-night"
+                  >
+                    <ArrowRight className="h-5 w-5" />
                   </span>
                 </button>
               </li>
@@ -222,18 +217,17 @@ function ListView({
         <button
           onClick={onVerdict}
           disabled={!canCreateVerdict}
-          className="font-display mt-6 flex h-16 w-full items-center justify-center gap-2 rounded-xl bg-night text-xl text-paper active:scale-[0.98] disabled:opacity-40"
+          className="btn btn-xl btn-primary mt-6 w-full"
         >
           Crea esito
         </button>
         {!canCreateVerdict ? (
-          <p className="mt-2 text-center text-[12px] text-ink-soft">
+          <p className="mt-2.5 text-center text-[13px] leading-relaxed text-ink-soft">
             Chiudi almeno una Operation o inserisci un voto per creare l'esito.
           </p>
         ) : (
-          <p className="mt-2 text-center text-[12px] text-ink-soft">
-            Il Board può deliberare con {closedCount} Operation concluse e{" "}
-            {votedCount} valutazioni.
+          <p className="mt-2.5 text-center text-[13px] leading-relaxed text-ink-soft">
+            Il Board può deliberare con {closedCount} Operation concluse e {votedCount} valutazioni.
           </p>
         )}
 
@@ -243,15 +237,7 @@ function ListView({
   );
 }
 
-function Counter({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "ok" | "muted";
-}) {
+function Counter({ label, value, tone }: { label: string; value: number; tone?: "ok" | "muted" }) {
   return (
     <div
       className={
@@ -263,25 +249,17 @@ function Counter({
             : "border-stamp/40 bg-stamp/10")
       }
     >
-      <div className="font-mono-tight text-[9px] uppercase tracking-widest text-ink-soft">
-        {label}
-      </div>
+      <div className="eyebrow text-[10px] text-ink-soft">{label}</div>
       <div className="font-display mt-0.5 text-2xl text-ink tabular-nums">{value}</div>
     </div>
   );
 }
 
 function StatusDot({ status, voted }: { status: OpStatus; voted: boolean }) {
-  if (voted)
-    return (
-      <CheckCircle2 className="h-7 w-7 shrink-0 text-approve" strokeWidth={2.2} />
-    );
-  if (status === "running")
-    return <Clock className="h-7 w-7 shrink-0 animate-pulse text-night" />;
-  if (status === "expired")
-    return <AlertTriangle className="h-7 w-7 shrink-0 text-stamp" />;
-  if (status === "done")
-    return <CheckCircle2 className="h-7 w-7 shrink-0 text-night" />;
+  if (voted) return <CheckCircle2 className="h-7 w-7 shrink-0 text-approve" strokeWidth={2.2} />;
+  if (status === "running") return <Clock className="h-7 w-7 shrink-0 animate-pulse text-night" />;
+  if (status === "expired") return <AlertTriangle className="h-7 w-7 shrink-0 text-stamp" />;
+  if (status === "done") return <CheckCircle2 className="h-7 w-7 shrink-0 text-night" />;
   return <Circle className="h-7 w-7 shrink-0 text-ink/25" />;
 }
 
@@ -295,8 +273,7 @@ function StatusChip({ status }: { status: OpStatus }) {
   return (
     <span
       className={
-        "rounded-md border px-2.5 py-1 font-mono-tight text-[10px] font-bold uppercase tracking-widest shadow-sm " +
-        styles[status]
+        "eyebrow rounded-md border px-2 py-1 text-[10px] font-bold shadow-sm " + styles[status]
       }
     >
       {STATUS_LABEL[status]}
@@ -347,45 +324,38 @@ function ReviewCarousel({
   const canCreateVerdict = closedCount > 0 || votedCount > 0;
 
   return (
-    <section className="bg-paper-2 px-4 pb-16 pt-10">
+    <section className="bg-paper-2 px-5 pb-16 pt-12">
       <div className="mx-auto max-w-xl">
-        <div className="space-y-3">
-          <button
-            onClick={onBack}
-            className="font-display flex h-13 w-full items-center justify-center gap-2 rounded-xl border-2 border-night bg-card px-4 text-base text-night active:scale-[0.98]"
-          >
-            <ChevronLeft className="h-5 w-5" /> Torna all'indice review
-          </button>
-          <div className="flex items-center justify-between px-1 font-mono-tight text-[11px] uppercase tracking-[0.18em] text-ink-soft">
-            <span>DOC-006 · Performance Review</span>
-            <span>
-              {index + 1} / {OPERATIONS.length}
-            </span>
-          </div>
+        <button onClick={onBack} className="btn btn-outline-dark w-full text-base">
+          <ChevronLeft className="h-5 w-5" /> Torna all'indice review
+        </button>
+        <div className="mt-3 flex items-center justify-between gap-2 eyebrow text-ink-soft">
+          <span>DOC-006 · Performance Review</span>
+          <span>
+            {index + 1} / {OPERATIONS.length}
+          </span>
         </div>
-        <h2 className="font-display mt-2 px-1 text-3xl text-ink">Performance Review</h2>
-        <p className="mt-1 px-1 text-[14px] text-ink-soft">
+        <h2 className="font-display mt-2 text-3xl text-ink">Performance Review</h2>
+        <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
           Scorri le schede, assegna un voto e modifica tutto quando serve.
         </p>
 
         {/* arrows + counter — stesso pattern di Operation */}
-        <div className="mt-5 flex items-center justify-between px-1">
+        <div className="mt-6 flex items-center justify-between">
           <button
             onClick={() => embla?.scrollPrev()}
             disabled={index === 0}
             aria-label="Review precedente"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/20 bg-card active:scale-95 disabled:opacity-30"
+            className="icon-btn border border-ink/20 bg-card"
           >
             <ChevronLeft className="h-5 w-5 text-ink" />
           </button>
-          <div className="font-display text-lg tabular-nums text-ink">
-            {OPERATIONS[index].code}
-          </div>
+          <div className="font-display text-lg tabular-nums text-ink">{OPERATIONS[index].code}</div>
           <button
             onClick={() => embla?.scrollNext()}
             disabled={index === OPERATIONS.length - 1}
             aria-label="Review successiva"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/20 bg-card active:scale-95 disabled:opacity-30"
+            className="icon-btn border border-ink/20 bg-card"
           >
             <ChevronRight className="h-5 w-5 text-ink" />
           </button>
@@ -408,7 +378,7 @@ function ReviewCarousel({
         </div>
 
         {/* dots */}
-        <div className="mt-5 flex justify-center gap-2">
+        <div className="mt-4 flex justify-center gap-0.5">
           {OPERATIONS.map((o, i) => {
             const voted = reviews[o.code]?.score != null;
             return (
@@ -416,15 +386,15 @@ function ReviewCarousel({
                 key={o.code}
                 onClick={() => embla?.scrollTo(i)}
                 aria-label={`Vai a review ${i + 1}`}
-                className={
-                  "h-2.5 rounded-full transition-all " +
-                  (i === index
-                    ? "w-8 bg-night"
-                    : voted
-                      ? "w-2.5 bg-approve"
-                      : "w-2.5 bg-ink/25")
-                }
-              />
+                className="dot-hit"
+              >
+                <span
+                  className={
+                    "h-2 rounded-full transition-all " +
+                    (i === index ? "w-7 bg-night" : voted ? "w-2 bg-approve" : "w-2 bg-ink/25")
+                  }
+                />
+              </button>
             );
           })}
         </div>
@@ -432,12 +402,12 @@ function ReviewCarousel({
         <button
           onClick={onVerdict}
           disabled={!canCreateVerdict}
-          className="font-display mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-night bg-card text-lg text-night active:scale-[0.98] disabled:opacity-40"
+          className="btn btn-xl btn-primary mt-6 w-full"
         >
           Crea esito
         </button>
         {!canCreateVerdict && (
-          <p className="mt-2 text-center text-[12px] text-ink-soft">
+          <p className="mt-2.5 text-center text-[13px] leading-relaxed text-ink-soft">
             Chiudi almeno una Operation o inserisci un voto prima di creare l'esito.
           </p>
         )}
@@ -459,48 +429,41 @@ function ReviewCard({
 }) {
   const toggleTag = (t: string) =>
     onChange({
-      tags: review.tags.includes(t)
-        ? review.tags.filter((x) => x !== t)
-        : [...review.tags, t],
+      tags: review.tags.includes(t) ? review.tags.filter((x) => x !== t) : [...review.tags, t],
     });
-  const hasInput =
-    review.score != null || review.tags.length > 0 || review.note.trim().length > 0;
+  const hasInput = review.score != null || review.tags.length > 0 || review.note.trim().length > 0;
   const clearReview = () => onChange({ score: null, tags: [], note: "" });
 
   return (
     <article className="rounded-2xl bg-card p-5 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.25)]">
-      <div className="flex items-center justify-between">
-        <div className="font-mono-tight text-[11px] uppercase tracking-[0.18em] text-stamp">
-          {op.code}
-        </div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="eyebrow text-stamp">{op.code}</div>
         <StatusChip status={status} />
       </div>
-      <h3 className="font-display mt-1 text-2xl leading-tight text-ink">{op.name}</h3>
-      <p className="mt-2 text-[14px] leading-snug text-ink-soft">
-        Obiettivo: {op.success}
-      </p>
+      <h3 className="font-display mt-1.5 text-2xl leading-tight text-ink">{op.name}</h3>
+      <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">Obiettivo: {op.success}</p>
 
-      <div className="mt-5">
-        <div className="flex items-center justify-between">
-          <div className="font-mono-tight text-[10px] uppercase tracking-widest text-ink-soft">
-            Board Rating
-          </div>
+      <div className="mt-6">
+        <div className="flex items-center justify-between gap-2">
+          <div className="eyebrow text-[10px] text-ink-soft">Board Rating</div>
           {review.score != null && (
             <button
               onClick={() => onChange({ score: null })}
-              className="flex items-center gap-1 rounded-lg border-2 border-stamp bg-stamp/10 px-3 py-2 text-[13px] font-bold text-stamp active:scale-95"
+              className="btn-chip border-2 border-stamp bg-stamp/10 text-stamp"
             >
               <X className="h-4 w-4" /> Cancella voto
             </button>
           )}
         </div>
-        <div className="mt-2 grid grid-cols-3 gap-2.5 sm:grid-cols-6">
+        <div className="mt-2.5 grid grid-cols-3 gap-2.5 sm:grid-cols-6">
           {SCORE_SCALE.map((s) => {
             const active = review.score === s.v;
             return (
               <button
                 key={s.v}
                 onClick={() => onChange({ score: active ? null : s.v })}
+                aria-label={`Voto ${s.v} — ${s.label}`}
+                aria-pressed={active}
                 className={
                   "font-display flex h-16 items-center justify-center rounded-xl text-3xl transition-all active:scale-95 " +
                   (active
@@ -520,30 +483,28 @@ function ReviewCard({
           })}
         </div>
         {review.score != null && (
-          <div className="mt-3 rounded-lg bg-ink/5 px-3 py-2 text-[14px] text-ink">
-            <span className="font-display">{review.score}</span> —{" "}
-            {SCORE_SCALE[review.score].label}.{" "}
-            <span className="text-ink-soft">{SCORE_SCALE[review.score].desc}</span>
+          <div className="mt-3 rounded-xl bg-ink/5 px-3.5 py-2.5 text-[14px] leading-relaxed text-ink">
+            <span className="font-display">{review.score}</span> — {SCORE_SCALE[review.score].label}
+            . <span className="text-ink-soft">{SCORE_SCALE[review.score].desc}</span>
           </div>
         )}
       </div>
 
-      <div className="mt-5">
-        <div className="font-mono-tight text-[10px] uppercase tracking-widest text-ink-soft">
-          Tag rapidi (opzionale)
-        </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+      <div className="mt-6">
+        <div className="eyebrow text-[10px] text-ink-soft">Tag rapidi (opzionale)</div>
+        <div className="mt-2.5 flex flex-wrap gap-2">
           {QUICK_TAGS.map((t) => {
             const active = review.tags.includes(t);
             return (
               <button
                 key={t}
                 onClick={() => toggleTag(t)}
+                aria-pressed={active}
                 className={
-                  "rounded-full border px-3.5 py-2 text-sm transition-colors active:scale-95 " +
+                  "inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors active:scale-95 " +
                   (active
                     ? "border-night bg-night text-paper shadow-sm"
-                    : "border-ink/20 bg-paper-2 text-ink")
+                    : "border-ink/20 bg-paper-2 text-ink hover:bg-ink/5")
                 }
               >
                 {t}
@@ -553,8 +514,8 @@ function ReviewCard({
         </div>
       </div>
 
-      <details className="mt-5 rounded-lg bg-paper-2 p-3">
-        <summary className="font-mono-tight cursor-pointer text-[11px] uppercase tracking-widest text-ink-soft">
+      <details className="mt-6 rounded-xl bg-paper-2 p-3">
+        <summary className="eyebrow flex min-h-9 cursor-pointer list-none items-center text-ink-soft">
           Note libere (opzionale)
         </summary>
         <textarea
@@ -562,14 +523,14 @@ function ReviewCard({
           onChange={(e) => onChange({ note: e.target.value })}
           placeholder="Verbalizza, se ne hai la forza."
           rows={3}
-          className="mt-2 w-full resize-none rounded-md border border-border bg-card p-3 text-[15px] outline-none focus:ring-2 focus:ring-night"
+          className="mt-2 w-full resize-none rounded-lg border border-border bg-card p-3 text-[15px] outline-none focus:ring-2 focus:ring-night"
         />
       </details>
 
       {hasInput && (
         <button
           onClick={clearReview}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-stamp bg-stamp/10 py-3 font-display text-base text-stamp active:scale-[0.98]"
+          className="btn mt-5 w-full border-2 border-stamp bg-stamp/10 text-base text-stamp"
         >
           <RotateCcw className="h-4 w-4" /> Cancella scheda review
         </button>
@@ -580,13 +541,7 @@ function ReviewCard({
 
 /* ──────────────────────────── RESULT ──────────────────────────── */
 
-function ResultScreen({
-  verdict,
-  onClear,
-}: {
-  verdict: StoredVerdict;
-  onClear: () => void;
-}) {
+function ResultScreen({ verdict, onClear }: { verdict: StoredVerdict; onClear: () => void }) {
   const share = async () => {
     const text = `MAS 2026 — Berlin Edition\nVerdetto: ${
       verdict.approved
@@ -611,12 +566,10 @@ function ResultScreen({
     >
       <div className="mx-auto max-w-xl">
         <div className="flex items-center justify-between gap-3">
-          <div className="font-mono-tight text-[11px] uppercase tracking-[0.18em] text-paper/60">
-            DOC-007 · Final Outcome
-          </div>
+          <div className="eyebrow text-paper/60">DOC-007 · Final Outcome</div>
           <button
             onClick={onClear}
-            className="flex items-center gap-1 rounded-md border border-paper/25 bg-paper/10 px-2.5 py-1.5 text-[12px] font-semibold text-paper active:scale-95"
+            className="btn-chip border border-paper/25 bg-paper/10 text-paper"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Undo
           </button>
@@ -660,36 +613,26 @@ function ResultScreen({
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
-          <button
-            onClick={share}
-            className="font-display flex h-16 items-center justify-center gap-2 rounded-xl bg-paper text-xl text-night active:scale-[0.98]"
-          >
+          <button onClick={share} className="btn btn-xl btn-light">
             <Share2 className="h-5 w-5" /> Share Outcome
           </button>
-          <button
-            onClick={onClear}
-            className="font-display flex h-16 items-center justify-center rounded-xl border-2 border-paper/30 px-5 text-paper active:scale-95"
-          >
+          <button onClick={onClear} className="btn btn-xl btn-outline-light sm:px-6">
             Delete
           </button>
         </div>
 
         <div className="mt-10">
-          <div className="font-mono-tight text-[11px] uppercase tracking-widest text-paper/60">
-            Operation Detail
-          </div>
+          <div className="eyebrow text-paper/60">Operation Detail</div>
           <div className="mt-3 space-y-2">
             {verdict.details.map((o) => {
               return (
                 <div
                   key={o.code}
-                  className="flex items-center gap-3 rounded-lg bg-paper/[0.05] px-3 py-2.5"
+                  className="flex items-center gap-3 rounded-xl bg-paper/[0.05] px-3.5 py-2.5"
                 >
-                  <div className="font-mono-tight text-[10px] uppercase tracking-widest text-paper/50">
-                    {o.code}
-                  </div>
+                  <div className="eyebrow text-[10px] text-paper/50">{o.code}</div>
                   <div className="min-w-0 flex-1 truncate text-[15px]">{o.name}</div>
-                  <div className="font-display text-2xl">{o.score ?? "—"}</div>
+                  <div className="font-display text-2xl tabular-nums">{o.score ?? "—"}</div>
                 </div>
               );
             })}
@@ -715,15 +658,11 @@ function Stat({
     <div
       className={
         "rounded-xl border p-4 " +
-        (tone === "bad"
-          ? "border-stamp bg-stamp/15"
-          : "border-paper/15 bg-paper/[0.04]")
+        (tone === "bad" ? "border-stamp bg-stamp/15" : "border-paper/15 bg-paper/[0.04]")
       }
     >
-      <div className="font-mono-tight text-[10px] uppercase tracking-widest text-paper/55">
-        {label}
-      </div>
-      <div className="font-display mt-1 flex items-baseline gap-1">
+      <div className="eyebrow text-[10px] text-paper/55">{label}</div>
+      <div className="font-display mt-1 flex items-baseline gap-1 tabular-nums">
         <span className="text-4xl">{value}</span>
         {sub && <span className="text-base text-paper/50">{sub}</span>}
       </div>

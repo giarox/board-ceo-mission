@@ -85,8 +85,12 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { -webkit-text-size-adjust: 100%; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -94,19 +98,43 @@
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: none;
   }
-  button { -webkit-tap-highlight-color: transparent; }
+  /* Every interactive control: no tap-highlight, no double-tap zoom delay. */
+  button,
+  a,
+  summary,
+  label,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* Visible, consistent focus ring for keyboard users only — stamp red reads
+     clearly on both the night (dark) and paper (light) surfaces. */
+  :where(button, a, summary, input, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-stamp);
+    outline-offset: 2px;
+  }
 }
 
-@utility font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
-@utility font-mono-tight { font-family: var(--font-mono); letter-spacing: 0; }
+@utility font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+@utility font-mono-tight {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
 
 @utility paper-grain {
   background-color: var(--color-paper);
   background-image:
     radial-gradient(oklch(0.7 0.04 85 / 0.12) 1px, transparent 1px),
     radial-gradient(oklch(0.7 0.04 85 / 0.08) 1px, transparent 1px);
-  background-size: 18px 18px, 11px 11px;
-  background-position: 0 0, 5px 7px;
+  background-size:
+    18px 18px,
+    11px 11px;
+  background-position:
+    0 0,
+    5px 7px;
 }
 
 @utility night-bg {
@@ -130,23 +158,181 @@
 }
 
 @keyframes stamp-in {
-  0% { opacity: 0; transform: rotate(-18deg) scale(2.2); }
-  60% { opacity: 1; transform: rotate(-6deg) scale(0.95); }
-  80% { transform: rotate(-10deg) scale(1.05); }
-  100% { opacity: 1; transform: rotate(-8deg) scale(1); }
+  0% {
+    opacity: 0;
+    transform: rotate(-18deg) scale(2.2);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(0.95);
+  }
+  80% {
+    transform: rotate(-10deg) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1);
+  }
 }
-@utility stamp-animate { animation: stamp-in 0.7s cubic-bezier(.2,.8,.2,1) forwards; }
+@utility stamp-animate {
+  animation: stamp-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
 
 @keyframes flash-red {
-  0% { background-color: oklch(0.5 0.25 27); }
-  50% { background-color: oklch(0.65 0.27 27); }
-  100% { background-color: oklch(0.5 0.25 27); }
+  0% {
+    background-color: oklch(0.5 0.25 27);
+  }
+  50% {
+    background-color: oklch(0.65 0.27 27);
+  }
+  100% {
+    background-color: oklch(0.5 0.25 27);
+  }
 }
-@utility flash-red { animation: flash-red 0.45s ease-in-out infinite; }
+@utility flash-red {
+  animation: flash-red 0.45s ease-in-out infinite;
+}
 
 @keyframes press {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.96); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
-@utility press-anim { animation: press 0.18s ease-out; }
+@utility press-anim {
+  animation: press 0.18s ease-out;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   DESIGN SYSTEM — buttons, controls, labels
+   One source of truth so every interactive element looks and behaves the same:
+   comfortable mobile hit targets (≥48px), consistent radius/typography, clear
+   pressed + disabled states. Compose a variant class alongside `.btn`.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Base action button — display type, 48px min height, generous tap area. */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding-inline: 1.25rem;
+  border-radius: 0.875rem;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-align: center;
+  white-space: nowrap;
+  transition:
+    transform 0.12s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+  &:active {
+    transform: scale(0.975);
+  }
+  &:disabled {
+    opacity: 0.42;
+  }
+}
+/* Large primary CTA — taller, bolder for the page's main actions. */
+@utility btn-xl {
+  min-height: 3.5rem;
+  font-size: 1.25rem;
+  padding-inline: 1.5rem;
+}
+
+/* Variants — paired so foreground always meets the background it sits on. */
+@utility btn-primary {
+  background: var(--color-night);
+  color: var(--color-paper);
+  box-shadow: 0 10px 30px -14px oklch(0.18 0.05 265 / 0.7);
+}
+@utility btn-positive {
+  background: var(--color-approve);
+  color: #fff;
+}
+@utility btn-danger {
+  background: var(--color-stamp);
+  color: #fff;
+}
+@utility btn-light {
+  background: var(--color-paper);
+  color: var(--color-night);
+}
+/* Outlined — for secondary actions on each surface. */
+@utility btn-outline-dark {
+  border: 2px solid var(--color-night);
+  color: var(--color-night);
+  background: var(--color-card);
+}
+@utility btn-outline-light {
+  border: 2px solid color-mix(in oklch, var(--color-paper) 30%, transparent);
+  color: var(--color-paper);
+  background: color-mix(in oklch, var(--color-paper) 6%, transparent);
+}
+
+/* Circular icon button (carousel arrows, etc.) — 48px round target. */
+@utility icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  width: 3rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  transition:
+    transform 0.12s ease,
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+  &:active {
+    transform: scale(0.93);
+  }
+  &:disabled {
+    opacity: 0.3;
+  }
+}
+
+/* Small inline pill button (annulla, cancella voto, undo). */
+@utility btn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  padding-inline: 0.75rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    transform 0.12s ease,
+    opacity 0.15s ease;
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Carousel dot — small visual pill inside a 44px-tall invisible hit area. */
+@utility dot-hit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.75rem;
+  min-width: 1.5rem;
+}
+
+/* Monospace eyebrow label — the recurring DOC-xxx / section tags. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
