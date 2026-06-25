@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { SCORE_SCALE } from "@/lib/operations";
 import { AdminPanel } from "@/components/AdminPanel";
 
@@ -40,10 +40,20 @@ export function Dossier() {
               k="Oggetto"
               v="Valutazione operativa dell'asset Giacomo Palazzo in vista della Marriage Acquisition."
             />
-            <DataRow k="Sede" v="Berlino, Repubblica Federale di Germania" />
-            <DataRow k="Asset" v="Giacomo Palazzo (CEO)" />
-            <DataRow k="Organo valutante" v="Il Board" />
-            <DataRow k="Esito atteso" v="Approvazione, con o senza riserva." last />
+            <DataRow
+              k="Headquarters"
+              v={
+                <>
+                  Pegasus Hostel Berlin
+                  <br />
+                  Str. der Pariser Kommune 35
+                  <br />
+                  10243 Berlin, Germany
+                </>
+              }
+            />
+            <DataRow k="Checkout Protocol" v="Checkout: 11:00" />
+            <DataRow k="Return Flight" v="Volo di ritorno: 14:30" last />
           </div>
 
           <p className="font-mono-tight mt-8 text-[11px] leading-relaxed text-paper/55">
@@ -168,7 +178,7 @@ export function Dossier() {
   );
 }
 
-function DataRow({ k, v, last }: { k: string; v: string; last?: boolean }) {
+function DataRow({ k, v, last }: { k: string; v: ReactNode; last?: boolean }) {
   return (
     <div className={"py-2.5 " + (last ? "" : "border-b border-paper/10")}>
       <div className="eyebrow text-[10px] text-paper/50">{k}</div>
