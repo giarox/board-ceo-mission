@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ArrowRight,
   RotateCcw,
+  Plus,
   X,
 } from "lucide-react";
 import {
@@ -65,7 +66,7 @@ export function PerformanceReview({
     const max = Math.max(1, scored.length) * 5;
     const avg = scored.length ? total / scored.length : 0;
     const closedCount = OPERATIONS.filter((o) =>
-      ["done", "expired"].includes(statuses[o.code]),
+      ["verified", "completed", "expired"].includes(statuses[o.code]),
     ).length;
 
     setVerdict({
@@ -134,7 +135,7 @@ function ListView({
   const votedCount = OPERATIONS.filter((o) => reviews[o.code]?.score != null).length;
   const activatedCount = OPERATIONS.filter((o) => statuses[o.code] !== "idle").length;
   const closedCount = OPERATIONS.filter((o) =>
-    ["done", "expired"].includes(statuses[o.code]),
+    ["verified", "completed", "expired"].includes(statuses[o.code]),
   ).length;
   const canCreateVerdict = closedCount > 0 || votedCount > 0;
 
@@ -143,7 +144,7 @@ function ListView({
     const score = (code: string) => {
       const voted = reviews[code]?.score != null ? 1 : 0;
       const st = statuses[code];
-      const stRank = st === "running" || st === "expired" ? 0 : st === "done" ? 1 : 2;
+      const stRank = st === "running" || st === "expired" ? 0 : st === "idle" ? 2 : 1;
       return voted * 10 + stRank;
     };
     return score(a.code) - score(b.code);
@@ -166,9 +167,9 @@ function ListView({
 
         {/* Counters */}
         <div className="mt-5 grid grid-cols-3 gap-2">
-          <Counter label="Active" value={activatedCount} />
-          <Counter label="Closed" value={closedCount} tone="ok" />
-          <Counter label="Rated" value={votedCount} tone="muted" />
+          <Counter label="Attive" value={activatedCount} />
+          <Counter label="Concluse" value={closedCount} tone="ok" />
+          <Counter label="Valutate" value={votedCount} tone="muted" />
         </div>
 
         {/* List */}
@@ -253,7 +254,9 @@ function StatusDot({ status, voted }: { status: OpStatus; voted: boolean }) {
   if (voted) return <CheckCircle2 className="h-7 w-7 shrink-0 text-approve" strokeWidth={2.2} />;
   if (status === "running") return <Clock className="h-7 w-7 shrink-0 animate-pulse text-night" />;
   if (status === "expired") return <AlertTriangle className="h-7 w-7 shrink-0 text-stamp" />;
-  if (status === "done") return <CheckCircle2 className="h-7 w-7 shrink-0 text-night" />;
+  if (status === "completed")
+    return <CheckCircle2 className="h-7 w-7 shrink-0 text-approve" strokeWidth={2.2} />;
+  if (status === "verified") return <CheckCircle2 className="h-7 w-7 shrink-0 text-approve" />;
   return <Circle className="h-7 w-7 shrink-0 text-ink/25" />;
 }
 
@@ -261,7 +264,8 @@ function StatusChip({ status }: { status: OpStatus }) {
   const styles: Record<OpStatus, string> = {
     idle: "border-transparent bg-ink/10 text-ink-soft",
     running: "border-night bg-night text-paper",
-    done: "border-approve bg-approve text-white",
+    verified: "border-approve bg-approve/15 text-approve",
+    completed: "border-approve bg-approve text-white",
     expired: "border-stamp bg-stamp text-white",
   };
   return (
@@ -308,11 +312,11 @@ function ReviewCarousel({
   }, [embla]);
 
   const applyPatch = (code: string, patch: Partial<Review>) => {
-    const cur = reviews[code] ?? { score: null, tags: [], note: "" };
+    const cur = reviews[code] ?? { score: null, tags: [], notes: [] };
     setReview(code, { ...cur, ...patch });
   };
   const closedCount = OPERATIONS.filter((o) =>
-    ["done", "expired"].includes(statuses[o.code]),
+    ["verified", "completed", "expired"].includes(statuses[o.code]),
   ).length;
   const votedCount = OPERATIONS.filter((o) => reviews[o.code]?.score != null).length;
   const canCreateVerdict = closedCount > 0 || votedCount > 0;
@@ -365,7 +369,7 @@ function ReviewCarousel({
                 <ReviewCard
                   op={op}
                   status={statuses[op.code]}
-                  review={reviews[op.code] ?? { score: null, tags: [], note: "" }}
+                  review={reviews[op.code] ?? { score: null, tags: [], notes: [] }}
                   onChange={(p) => applyPatch(op.code, p)}
                 />
               </div>
@@ -423,8 +427,14 @@ function ReviewCard({
   review: Review;
   onChange: (p: Partial<Review>) => void;
 }) {
-  const hasInput = review.score != null || review.note.trim().length > 0;
-  const clearReview = () => onChange({ score: null, tags: [], note: "" });
+  const notes = review.notes ?? [];
+  const hasInput = review.score != null || notes.length > 0;
+  const clearReview = () => onChange({ score: null, tags: [], notes: [] });
+  const addNote = (text: string) => {
+    const t = text.trim();
+    if (t) onChange({ notes: [...notes, t] });
+  };
+  const removeNote = (i: number) => onChange({ notes: notes.filter((_, j) => j !== i) });
 
   return (
     <article className="rounded-2xl bg-card p-5 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.25)]">
@@ -484,17 +494,36 @@ function ReviewCard({
       </div>
 
       <div className="mt-6">
-        <label htmlFor={`note-${op.code}`} className="eyebrow block text-[10px] text-ink-soft">
-          Note libere
-        </label>
-        <textarea
-          id={`note-${op.code}`}
-          value={review.note}
-          onChange={(e) => onChange({ note: e.target.value })}
-          placeholder="Verbalizza, se ne hai la forza."
-          rows={3}
-          className="mt-2.5 w-full resize-none rounded-xl border-2 border-border bg-paper-2 p-3.5 text-[15px] leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-soft/60 focus:border-night focus:bg-card"
-        />
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="eyebrow text-[10px] text-ink-soft">Note libere</div>
+          {notes.length > 0 && (
+            <div className="text-[11px] text-ink-soft/70">{notes.length} salvate</div>
+          )}
+        </div>
+
+        {notes.length > 0 && (
+          <ul className="mt-2.5 space-y-2">
+            {notes.map((n, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-2 rounded-xl border border-border bg-paper-2 p-3"
+              >
+                <span className="min-w-0 flex-1 break-words text-[15px] leading-snug text-ink">
+                  {n}
+                </span>
+                <button
+                  onClick={() => removeNote(i)}
+                  aria-label="Elimina nota"
+                  className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-soft active:scale-90"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <NoteComposer onAdd={addNote} />
       </div>
 
       {hasInput && (
@@ -506,6 +535,41 @@ function ReviewCard({
         </button>
       )}
     </article>
+  );
+}
+
+function NoteComposer({ onAdd }: { onAdd: (text: string) => void }) {
+  const [draft, setDraft] = useState("");
+  const submit = () => {
+    if (!draft.trim()) return;
+    onAdd(draft);
+    setDraft("");
+  };
+  return (
+    <div className="mt-2.5 flex gap-2">
+      <input
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            submit();
+          }
+        }}
+        enterKeyHint="done"
+        placeholder="Aggiungi una nota…"
+        className="min-w-0 flex-1 rounded-xl border-2 border-border bg-paper-2 px-3.5 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft/60 focus:border-night focus:bg-card"
+      />
+      <button
+        onClick={submit}
+        disabled={!draft.trim()}
+        aria-label="Aggiungi nota"
+        className="btn btn-primary h-12 shrink-0 px-4"
+      >
+        <Plus className="h-5 w-5" />
+        Aggiungi
+      </button>
+    </div>
   );
 }
 
@@ -549,11 +613,7 @@ function ResultScreen({ verdict, onClear }: { verdict: StoredVerdict; onClear: (
         <div className="mt-6 grid grid-cols-2 gap-3">
           <Stat label="Score" value={`${verdict.total}`} sub={`/ ${verdict.max}`} />
           <Stat label="Average" value={verdict.avg.toFixed(2)} sub="/ 5" />
-          <Stat
-            label="Closed Ops"
-            value={`${verdict.closedCount}`}
-            sub={`/ ${OPERATIONS.length}`}
-          />
+          <Stat label="Concluse" value={`${verdict.closedCount}`} sub={`/ ${OPERATIONS.length}`} />
           <Stat
             label="Outcome"
             value={verdict.approved ? "OK" : "RIS."}

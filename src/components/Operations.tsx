@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight, Play, Check, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Check, CheckCheck, RotateCcw } from "lucide-react";
 import { OPERATIONS, type Operation, type OpRuntime, EMPTY_OP_RUNTIME } from "@/lib/operations";
 import { useLocalState } from "@/lib/use-local-state";
 
@@ -128,6 +128,12 @@ function OpCard({ op }: { op: Operation }) {
 
   const display = state.elapsedMs != null ? state.elapsedMs : remainingMs;
   const activated = state.elapsedMs != null;
+  const completed = !!state.completed;
+  const complete = () => setState({ ...state, completed: true });
+  // "Annulla" on a started op resets it; on a completed one it just re-opens it.
+  const undo = completed
+    ? { label: "Riapri", onClick: () => setState({ ...state, completed: false }) }
+    : { label: "Annulla", onClick: reset };
 
   return (
     <article className="rounded-2xl bg-paper text-ink shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
@@ -150,28 +156,63 @@ function OpCard({ op }: { op: Operation }) {
         {op.noTimer ? (
           /* Activation toggle — no countdown, runs all night, revertible */
           <div className="mt-5">
-            {activated ? (
-              <div className="rounded-2xl border border-approve/40 bg-approve/10 p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-approve">
-                    <Check className="h-6 w-6 shrink-0" />
-                    <span className="font-display text-xl leading-tight">Operatività avviata</span>
-                  </div>
-                  <button
-                    onClick={reset}
-                    className="btn-chip border border-border bg-paper-2 text-ink"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" /> Annulla
-                  </button>
-                </div>
-                <div className="mt-2 text-[13px] leading-snug text-ink-soft">
-                  Badge e dotazione attivi fino a fine giornata.
-                </div>
-              </div>
-            ) : (
+            {!activated ? (
               <button onClick={activate} className="btn btn-xl btn-primary w-full">
                 <Play className="h-6 w-6" /> Attiva
               </button>
+            ) : (
+              <>
+                <div
+                  className={
+                    "rounded-2xl border p-4 " +
+                    (completed
+                      ? "border-approve bg-approve text-white"
+                      : "border-approve/40 bg-approve/10")
+                  }
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div
+                      className={
+                        "flex items-center gap-2 " + (completed ? "text-white" : "text-approve")
+                      }
+                    >
+                      <Check className="h-6 w-6 shrink-0" />
+                      <span className="font-display text-xl leading-tight">
+                        {completed ? "Completata" : "Operatività avviata"}
+                      </span>
+                    </div>
+                    <button
+                      onClick={undo.onClick}
+                      className={
+                        "btn-chip border " +
+                        (completed
+                          ? "border-white/40 bg-white/15 text-white"
+                          : "border-border bg-paper-2 text-ink")
+                      }
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" /> {undo.label}
+                    </button>
+                  </div>
+                  <div
+                    className={
+                      "mt-2 text-[13px] leading-snug " +
+                      (completed ? "text-white/80" : "text-ink-soft")
+                    }
+                  >
+                    {completed
+                      ? "Operazione chiusa dal Board."
+                      : "Badge e dotazione attivi fino a fine giornata."}
+                  </div>
+                </div>
+                {!completed && (
+                  <button
+                    onClick={complete}
+                    className="btn btn-outline-dark mt-2 h-12 w-full text-base"
+                  >
+                    <CheckCheck className="h-5 w-5" /> Segna come completata
+                  </button>
+                )}
+              </>
             )}
           </div>
         ) : (
@@ -187,10 +228,10 @@ function OpCard({ op }: { op: Operation }) {
               </div>
               {(running || activated || state.expired) && (
                 <button
-                  onClick={reset}
+                  onClick={undo.onClick}
                   className="btn-chip border border-border bg-paper-2 text-ink"
                 >
-                  <RotateCcw className="h-3.5 w-3.5" /> Annulla
+                  <RotateCcw className="h-3.5 w-3.5" /> {undo.label}
                 </button>
               )}
             </div>
@@ -214,15 +255,30 @@ function OpCard({ op }: { op: Operation }) {
               </button>
             ) : running ? (
               <button onClick={done} className="btn btn-xl btn-positive mt-3 w-full">
-                <Check className="h-6 w-6" /> Fatto
+                <Check className="h-6 w-6" /> Stoppa
               </button>
-            ) : (
-              <div className="mt-3 rounded-xl bg-approve/15 px-4 py-3 text-center">
-                <div className="font-display text-lg text-approve">Operatività avviata</div>
-                <div className="eyebrow mt-1 text-[11px] text-ink-soft">
-                  verificata in {fmt(state.elapsedMs!)}
+            ) : completed ? (
+              <div className="mt-3 rounded-xl bg-approve px-4 py-3 text-center text-white">
+                <div className="font-display text-lg">Completata</div>
+                <div className="eyebrow mt-1 text-[11px] text-white/80">
+                  operazione chiusa dal Board
                 </div>
               </div>
+            ) : (
+              <>
+                <div className="mt-3 rounded-xl bg-approve/15 px-4 py-3 text-center">
+                  <div className="font-display text-lg text-approve">Operatività verificata</div>
+                  <div className="eyebrow mt-1 text-[11px] text-ink-soft">
+                    in {fmt(state.elapsedMs!)}
+                  </div>
+                </div>
+                <button
+                  onClick={complete}
+                  className="btn btn-outline-dark mt-2 h-12 w-full text-base"
+                >
+                  <CheckCheck className="h-5 w-5" /> Segna come completata
+                </button>
+              </>
             )}
           </div>
         )}

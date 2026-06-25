@@ -144,35 +144,43 @@ export const QUICK_TAGS = [
   "da rimuovere dagli atti",
 ];
 
-// Shared types for review state
-export type Review = { score: number | null; tags: string[]; note: string };
+// Shared types for review state. `notes` is a list so the Board can pile on
+// several quick notes per Operation.
+export type Review = { score: number | null; tags: string[]; notes: string[] };
 export const EMPTY_REVIEWS: Record<string, Review> = Object.fromEntries(
-  OPERATIONS.map((o) => [o.code, { score: null, tags: [], note: "" }]),
+  OPERATIONS.map((o) => [o.code, { score: null, tags: [], notes: [] }]),
 );
 
-// Operation runtime state (mirrors Operations.tsx OpCard storage)
+// Operation runtime state (mirrors Operations.tsx OpCard storage).
+// `completed` is the explicit "mission done" flag, set after the immediate
+// verification (timer stop / activation) — the operation itself runs all night.
 export type OpRuntime = {
   elapsedMs: number | null;
   startedAt: number | null;
   expired: boolean;
+  completed?: boolean;
 };
 export const EMPTY_OP_RUNTIME: OpRuntime = { elapsedMs: null, startedAt: null, expired: false };
 
-export type OpStatus = "idle" | "running" | "done" | "expired";
+export type OpStatus = "idle" | "running" | "verified" | "completed" | "expired";
 
 export function statusFromRuntime(s: OpRuntime | null | undefined): OpStatus {
   // Use == null so a missing field (Realtime DB drops null/empty values on
   // write) reads the same as an explicit null.
   if (!s) return "idle";
+  if (s.completed) return "completed";
   if (s.expired) return "expired";
   if (s.startedAt != null && s.elapsedMs == null) return "running";
-  if (s.elapsedMs != null) return "done";
+  if (s.elapsedMs != null) return "verified";
   return "idle";
 }
 
+// Compact labels for the review chips. The Operation card shows the fuller
+// phrasing ("Operatività verificata", etc.) inline.
 export const STATUS_LABEL: Record<OpStatus, string> = {
-  idle: "Pending",
-  running: "Live",
-  done: "Closed",
-  expired: "Timed out",
+  idle: "In attesa",
+  running: "In corso",
+  verified: "Verificata",
+  completed: "Completata",
+  expired: "Scaduta",
 };
