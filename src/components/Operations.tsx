@@ -3,12 +3,11 @@ import useEmblaCarousel from "embla-carousel-react";
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Play,
   Check,
   CheckCheck,
   RotateCcw,
-  Lightbulb,
-  X,
 } from "lucide-react";
 import { OPERATIONS, type Operation, type OpRuntime, EMPTY_OP_RUNTIME } from "@/lib/operations";
 import { useLocalState } from "@/lib/use-local-state";
@@ -149,8 +148,10 @@ function OpCard({ op }: { op: Operation }) {
     <article className="rounded-2xl bg-paper text-ink shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
       <header className="flex items-center justify-between gap-2 border-b border-border px-5 py-3.5">
         <div className="eyebrow text-stamp">{op.code}</div>
-        <div className="eyebrow text-[10px] text-ink-soft">
-          {op.noTimer ? "Tutta la giornata" : `Verifica entro ${op.limitMin} min`}
+        <div className="eyebrow max-w-[58%] text-right text-[10px] text-ink-soft">
+          {op.noTimer
+            ? "Da verificare durante tutto il Summit"
+            : `Da verificare entro ${op.limitMin} min`}
         </div>
       </header>
 
@@ -171,12 +172,40 @@ function OpCard({ op }: { op: Operation }) {
         )}
 
         {op.callIdeas && (
-          <button
-            onClick={() => setIdeasOpen(true)}
-            className="btn btn-outline-dark mt-4 h-12 w-full text-base"
-          >
-            <Lightbulb className="h-5 w-5" /> Visualizza idee chiamate
-          </button>
+          <div className="mt-4 overflow-hidden rounded-xl border border-border">
+            <button
+              onClick={() => setIdeasOpen((o) => !o)}
+              aria-expanded={ideasOpen}
+              className="flex w-full items-center justify-between gap-2 bg-paper-2 px-4 py-3 text-left active:bg-ink/5"
+            >
+              <span className="eyebrow text-[11px] text-ink-soft">Visualizza idee</span>
+              <ChevronDown
+                className={
+                  "h-4 w-4 shrink-0 text-ink-soft transition-transform duration-300 " +
+                  (ideasOpen ? "rotate-180" : "")
+                }
+              />
+            </button>
+            <div
+              className={
+                "grid transition-all duration-300 ease-out " +
+                (ideasOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]")
+              }
+            >
+              <div className="overflow-hidden">
+                <div className="space-y-4 border-t border-border bg-card p-4">
+                  {op.callIdeas.map((idea, i) => (
+                    <div key={i}>
+                      <div className="font-display text-base leading-tight text-ink">
+                        {idea.title}
+                      </div>
+                      <p className="mt-1 text-[14px] leading-relaxed text-ink-soft">{idea.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {op.noTimer ? (
@@ -311,9 +340,6 @@ function OpCard({ op }: { op: Operation }) {
       </div>
 
       {state.expired && <FullscreenShot onClose={reset} />}
-      {ideasOpen && op.callIdeas && (
-        <CallIdeasModal ideas={op.callIdeas} onClose={() => setIdeasOpen(false)} />
-      )}
     </article>
   );
 }
@@ -354,66 +380,6 @@ function FullscreenShot({ onClose }: { onClose: () => void }) {
       <button onClick={onClose} className="btn btn-xl mt-10 bg-white px-8 text-stamp">
         Ho bevuto
       </button>
-    </div>
-  );
-}
-
-function CallIdeasModal({ ideas, onClose }: { ideas: string[]; onClose: () => void }) {
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
-
-  return (
-    <div
-      className="fixed inset-0 z-[95] flex items-end justify-center bg-night/70 p-3 backdrop-blur-sm sm:items-center"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Idee per le chiamate"
-    >
-      <div
-        className="max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl bg-paper p-5 text-ink shadow-[0_24px_70px_-20px_rgba(0,0,0,0.7)]"
-        style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5 text-stamp" />
-            <div>
-              <div className="eyebrow text-ink-soft">Berlin Calling</div>
-              <h3 className="font-display text-2xl leading-tight">Idee chiamate</h3>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Chiudi"
-            className="icon-btn -mr-1 -mt-1 border border-border bg-card text-ink"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
-          Due scenari già pronti. Il Board sceglie, il CEO esegue.
-        </p>
-
-        <ol className="mt-4 space-y-2.5">
-          {ideas.map((idea, i) => (
-            <li key={i} className="flex gap-3 rounded-xl border border-border bg-card p-3.5">
-              <div className="font-display flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-night text-[13px] text-paper">
-                {i + 1}
-              </div>
-              <p className="min-w-0 text-[15px] leading-relaxed text-ink">{idea}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
     </div>
   );
 }

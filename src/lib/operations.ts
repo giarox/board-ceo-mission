@@ -7,8 +7,8 @@ export type Operation = {
   success: string;
   // Optional penalty/failure condition shown as its own red callout.
   failure?: string;
-  // Optional pre-thought scenarios surfaced behind a button (e.g. call ideas).
-  callIdeas?: string[];
+  // Optional pre-thought scenarios surfaced in a collapsible (e.g. call ideas).
+  callIdeas?: { title: string; text: string }[];
   // No countdown: it's a state you switch on for the whole night, not a timed task.
   noTimer?: boolean;
 };
@@ -50,8 +50,14 @@ export const OPERATIONS: Operation[] = [
     success:
       "Generare almeno una reazione valida, reale e genuina dall'altra parte della cornetta. Silenzi imbarazzati inclusi.",
     callIdeas: [
-      "Chiama un amico non presente e fagli credere che stai seriamente mettendo in dubbio il matrimonio e l'idea stessa di sposarti.",
-      "Chiama un parente (o qualcuno di mooolto vicino) e fagli credere che abbiamo perso Andre, il fratello, qui a Berlino.",
+      {
+        title: "Crisi Matrimoniale Improvvisa",
+        text: "Chiama un amico non presente e fagli credere che stai mettendo in serio dubbio l'idea di sposarti o il matrimonio in generale.",
+      },
+      {
+        title: "Asset Familiare Disperso",
+        text: "Chiama un parente o una persona molto vicina e fagli credere abbia perso Andrea a Berlino, ha il telefono scarico e non sai più che fare.",
+      },
     ],
   },
   {
