@@ -94,9 +94,9 @@ export function Dossier() {
             ].map((s, i) => (
               <li
                 key={i}
-                className="flex gap-4 rounded-lg bg-card p-4 shadow-[0_1px_0_var(--color-border)]"
+                className="flex gap-3 rounded-lg bg-card p-4 shadow-[0_1px_0_var(--color-border)]"
               >
-                <div className="font-display flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-night text-paper">
+                <div className="font-display flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-night text-[13px] text-paper">
                   {i + 1}
                 </div>
                 <div className="min-w-0">

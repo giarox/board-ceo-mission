@@ -124,7 +124,9 @@ function OpCard({
       onExpire();
       try {
         navigator.vibrate?.([200, 80, 200, 80, 400]);
-      } catch {}
+      } catch {
+        // Vibration API may be unavailable or blocked — non-critical.
+      }
     }
     if (!running) expiredFiredRef.current = false;
   }, [running, remainingMs]); // eslint-disable-line
@@ -134,18 +136,23 @@ function OpCard({
     const used = Date.now() - (state.startedAt ?? Date.now());
     setState({ elapsedMs: used, startedAt: null, expired: false });
   };
+  // No-timer ops are simply switched on; elapsedMs marks the activated state.
+  const activate = () => setState({ elapsedMs: 0, startedAt: Date.now(), expired: false });
   const reset = () => {
     if (state.expired) onUndoExpire();
     setState(EMPTY_OP_RUNTIME);
   };
 
   const display = state.elapsedMs != null ? state.elapsedMs : remainingMs;
+  const activated = state.elapsedMs != null;
 
   return (
     <article className="rounded-2xl bg-paper text-ink shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
       <header className="flex items-center justify-between gap-2 border-b border-border px-5 py-3.5">
         <div className="eyebrow text-stamp">{op.code}</div>
-        <div className="eyebrow text-[10px] text-ink-soft">Verifica entro {op.limitMin} min</div>
+        <div className="eyebrow text-[10px] text-ink-soft">
+          {op.noTimer ? "Tutta la giornata" : `Verifica entro ${op.limitMin} min`}
+        </div>
       </header>
 
       <div className="px-5 pb-5 pt-4">
@@ -157,57 +164,85 @@ function OpCard({
           {op.success}
         </Block>
 
-        {/* Timer */}
-        <div className="mt-5 rounded-2xl border border-border bg-card p-4">
-          <div className="mb-3 flex items-center justify-center gap-2 rounded-xl border border-stamp/35 bg-stamp/10 px-3 py-2 text-center">
-            <span className="eyebrow text-[10px] text-stamp">Verifica entro</span>
-            <span className="font-display text-lg text-ink">{op.limitMin} min</span>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <div className="eyebrow text-[10px] text-ink-soft">
-              {state.elapsedMs != null
-                ? "Tempo registrato"
-                : running
-                  ? "Tempo rimanente"
-                  : "Pronto"}
-            </div>
-            {(running || state.elapsedMs != null || state.expired) && (
-              <button onClick={reset} className="btn-chip border border-border bg-paper-2 text-ink">
-                <RotateCcw className="h-3.5 w-3.5" /> Annulla
+        {op.noTimer ? (
+          /* Activation toggle — no countdown, runs all night, revertible */
+          <div className="mt-5">
+            {activated ? (
+              <div className="rounded-2xl border border-approve/40 bg-approve/10 p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-approve">
+                    <Check className="h-6 w-6 shrink-0" />
+                    <span className="font-display text-xl leading-tight">Operatività avviata</span>
+                  </div>
+                  <button
+                    onClick={reset}
+                    className="btn-chip border border-border bg-paper-2 text-ink"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" /> Annulla
+                  </button>
+                </div>
+                <div className="mt-2 text-[13px] leading-snug text-ink-soft">
+                  Badge e dotazione attivi fino a fine giornata.
+                </div>
+              </div>
+            ) : (
+              <button onClick={activate} className="btn btn-xl btn-primary w-full">
+                <Play className="h-6 w-6" /> Attiva
               </button>
             )}
           </div>
-          <div
-            className={
-              "font-display mt-1 text-center text-[64px] leading-none tabular-nums " +
-              (running && remainingMs < 30_000 ? "text-stamp" : "text-ink")
-            }
-          >
-            {fmt(display)}
-          </div>
-
-          {state.expired ? (
-            <div className="mt-3 rounded-xl bg-stamp px-4 py-3 text-center text-white">
-              <div className="font-display text-xl">Tempo scaduto</div>
-              <div className="eyebrow mt-1 text-[11px]">Shot per il CEO</div>
+        ) : (
+          /* Timer */
+          <div className="mt-5 rounded-2xl border border-border bg-card p-4">
+            <div className="mb-3 flex items-center justify-center gap-2 rounded-xl border border-stamp/35 bg-stamp/10 px-3 py-2 text-center">
+              <span className="eyebrow text-[10px] text-stamp">Verifica entro</span>
+              <span className="font-display text-lg text-ink">{op.limitMin} min</span>
             </div>
-          ) : !running && state.elapsedMs == null ? (
-            <button onClick={start} className="btn btn-xl btn-primary mt-3 w-full">
-              <Play className="h-6 w-6" /> Avvia
-            </button>
-          ) : running ? (
-            <button onClick={done} className="btn btn-xl btn-positive mt-3 w-full">
-              <Check className="h-6 w-6" /> Fatto
-            </button>
-          ) : (
-            <div className="mt-3 rounded-xl bg-approve/15 px-4 py-3 text-center">
-              <div className="font-display text-lg text-approve">Operation completata</div>
-              <div className="eyebrow mt-1 text-[11px] text-ink-soft">
-                in {fmt(state.elapsedMs!)}
+            <div className="flex items-center justify-between gap-2">
+              <div className="eyebrow text-[10px] text-ink-soft">
+                {activated ? "Tempo registrato" : running ? "Tempo rimanente" : "Pronto"}
               </div>
+              {(running || activated || state.expired) && (
+                <button
+                  onClick={reset}
+                  className="btn-chip border border-border bg-paper-2 text-ink"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Annulla
+                </button>
+              )}
             </div>
-          )}
-        </div>
+            <div
+              className={
+                "font-display mt-1 text-center text-[64px] leading-none tabular-nums " +
+                (running && remainingMs < 30_000 ? "text-stamp" : "text-ink")
+              }
+            >
+              {fmt(display)}
+            </div>
+
+            {state.expired ? (
+              <div className="mt-3 rounded-xl bg-stamp px-4 py-3 text-center text-white">
+                <div className="font-display text-xl">Tempo scaduto</div>
+                <div className="eyebrow mt-1 text-[11px]">Shot per il CEO</div>
+              </div>
+            ) : !running && !activated ? (
+              <button onClick={start} className="btn btn-xl btn-primary mt-3 w-full">
+                <Play className="h-6 w-6" /> Avvia
+              </button>
+            ) : running ? (
+              <button onClick={done} className="btn btn-xl btn-positive mt-3 w-full">
+                <Check className="h-6 w-6" /> Fatto
+              </button>
+            ) : (
+              <div className="mt-3 rounded-xl bg-approve/15 px-4 py-3 text-center">
+                <div className="font-display text-lg text-approve">Operatività avviata</div>
+                <div className="eyebrow mt-1 text-[11px] text-ink-soft">
+                  verificata in {fmt(state.elapsedMs!)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {state.expired && <FullscreenShot onClose={reset} />}

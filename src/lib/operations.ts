@@ -5,6 +5,8 @@ export type Operation = {
   activation: string;
   briefing: string;
   success: string;
+  // No countdown: it's a state you switch on for the whole night, not a timed task.
+  noTimer?: boolean;
 };
 
 export const OPERATIONS: Operation[] = [
@@ -12,6 +14,7 @@ export const OPERATIONS: Operation[] = [
     code: "OP-01",
     name: "Badge Activation",
     limitMin: 5,
+    noTimer: true,
     activation:
       "Giacomo, in qualità di CEO, da questo momento sei ufficialmente tracciabile, valutabile e — se necessario — sostituibile senza preavviso.",
     briefing:

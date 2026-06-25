@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import {
   OPERATIONS,
-  QUICK_TAGS,
   SCORE_SCALE,
   STATUS_LABEL,
   statusFromRuntime,
@@ -238,19 +237,14 @@ function ListView({
 }
 
 function Counter({ label, value, tone }: { label: string; value: number; tone?: "ok" | "muted" }) {
+  const dot = tone === "ok" ? "bg-approve" : tone === "muted" ? "bg-ink/30" : "bg-stamp";
   return (
-    <div
-      className={
-        "rounded-xl border p-3 " +
-        (tone === "ok"
-          ? "border-approve/40 bg-approve/10"
-          : tone === "muted"
-            ? "border-border bg-card"
-            : "border-stamp/40 bg-stamp/10")
-      }
-    >
-      <div className="eyebrow text-[10px] text-ink-soft">{label}</div>
-      <div className="font-display mt-0.5 text-2xl text-ink tabular-nums">{value}</div>
+    <div className="rounded-xl border border-border bg-card p-3">
+      <div className="flex items-center gap-1.5">
+        <span className={"h-1.5 w-1.5 shrink-0 rounded-full " + dot} />
+        <span className="eyebrow text-[10px] text-ink-soft">{label}</span>
+      </div>
+      <div className="font-display mt-1 text-2xl text-ink tabular-nums">{value}</div>
     </div>
   );
 }
@@ -265,7 +259,7 @@ function StatusDot({ status, voted }: { status: OpStatus; voted: boolean }) {
 
 function StatusChip({ status }: { status: OpStatus }) {
   const styles: Record<OpStatus, string> = {
-    idle: "border-ink/25 bg-paper-2 text-ink",
+    idle: "border-transparent bg-ink/10 text-ink-soft",
     running: "border-night bg-night text-paper",
     done: "border-approve bg-approve text-white",
     expired: "border-stamp bg-stamp text-white",
@@ -429,11 +423,7 @@ function ReviewCard({
   review: Review;
   onChange: (p: Partial<Review>) => void;
 }) {
-  const toggleTag = (t: string) =>
-    onChange({
-      tags: review.tags.includes(t) ? review.tags.filter((x) => x !== t) : [...review.tags, t],
-    });
-  const hasInput = review.score != null || review.tags.length > 0 || review.note.trim().length > 0;
+  const hasInput = review.score != null || review.note.trim().length > 0;
   const clearReview = () => onChange({ score: null, tags: [], note: "" });
 
   return (
@@ -494,36 +484,8 @@ function ReviewCard({
       </div>
 
       <div className="mt-6">
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="eyebrow text-[10px] text-ink-soft">Tag rapidi</div>
-          <div className="text-[11px] text-ink-soft/70">tocca per selezionare</div>
-        </div>
-        <div className="mt-2.5 flex flex-wrap gap-2">
-          {QUICK_TAGS.map((t) => {
-            const active = review.tags.includes(t);
-            return (
-              <button
-                key={t}
-                onClick={() => toggleTag(t)}
-                aria-pressed={active}
-                className={
-                  "inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors active:scale-95 " +
-                  (active
-                    ? "border-night bg-night text-paper shadow-sm"
-                    : "border-ink/20 bg-paper-2 text-ink hover:bg-ink/5")
-                }
-              >
-                {t}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <label htmlFor={`note-${op.code}`} className="flex items-baseline justify-between gap-2">
-          <span className="eyebrow text-[10px] text-ink-soft">Note libere</span>
-          <span className="text-[11px] text-ink-soft/70">scrivi a mano</span>
+        <label htmlFor={`note-${op.code}`} className="eyebrow block text-[10px] text-ink-soft">
+          Note libere
         </label>
         <textarea
           id={`note-${op.code}`}
@@ -608,7 +570,7 @@ function ResultScreen({ verdict, onClear }: { verdict: StoredVerdict; onClear: (
             }
             style={{ letterSpacing: "0.08em" }}
           >
-            {verdict.approved ? "Approved" : "Approved w/ reserve"}
+            {verdict.approved ? "Approvato" : "Con riserva"}
           </div>
           <p className="font-display mt-6 text-xl leading-tight text-paper">
             {verdict.approved
