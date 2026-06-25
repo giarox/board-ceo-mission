@@ -39,7 +39,7 @@ export function Dossier() {
       <section className="paper-grain px-6 py-14">
         <div className="mx-auto max-w-xl">
           <SectionLabel code="DOC-002" name="Executive Brief" />
-          <h2 className="font-display mt-3 text-3xl text-ink">Perché ci siamo riuniti</h2>
+          <h2 className="font-display mt-3 text-3xl text-ink">Mandato del Board</h2>
           <p className="mt-4 text-[17px] leading-relaxed text-ink">
             Il Board si riunisce a Berlino per verificare se Giacomo Palazzo, in qualità di CEO,
             sia effettivamente pronto alla fase finale della Marriage Acquisition o se sia
